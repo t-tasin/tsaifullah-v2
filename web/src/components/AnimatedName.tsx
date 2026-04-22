@@ -49,7 +49,7 @@ export default function AnimatedName() {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="font-mono text-base tracking-tight sm:tracking-normal sm:text-2xl lg:text-4xl text-accent flex items-center flex-wrap w-full"
+              className="font-mono text-base tracking-tight sm:tracking-normal sm:text-2xl lg:text-4xl text-accent flex items-center whitespace-nowrap"
             >
               <motion.span className="text-muted mr-2 shrink-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1 }}>
                 {declaration}
