@@ -127,6 +127,7 @@ const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
         if (!loader) return;
         
         if (window._npmLoaderInterval) clearInterval(window._npmLoaderInterval);
+        loader.style.transition = 'opacity 0.2s ease-out';
         loader.style.opacity = '0';
       }
 
@@ -139,26 +140,28 @@ const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
           // If we're just navigating to a hash on the same page, don't show the loader
           if (ev.to.pathname === window.location.pathname) return;
 
+          // Skip loader on back/forward browser navigation to prevent getting stuck
+          if (ev.navigationType === 'traverse' || ev.direction === 'back') return;
+
           ev.preventDefault(); // Pause the navigation
           
           const originalLoader = document.getElementById('npm-loader');
-          if(originalLoader) originalLoader.style.transition = 'none'; 
+          if (originalLoader) originalLoader.style.transition = 'none'; 
           startLoader();
           
-          // Resume navigation after 500ms for a snappy transition
-          setTimeout(() => {
-            ev.loader();
+          // Resume navigation after 500ms
+          setTimeout(async () => {
+            try {
+              await ev.loader();
+            } catch (err) {
+              console.error("Loader failed, falling back to hard navigation", err);
+              window.location.href = ev.to.href;
+            }
           }, 500);
         });
 
-        document.addEventListener('astro:after-swap', () => {
-          const loader = document.getElementById('npm-loader');
-          if(loader) {
-            loader.style.transition = 'opacity 0.2s ease-out';
-            loader.style.opacity = '1';
-            setTimeout(stopLoader, 50); 
-          }
-        });
+        document.addEventListener('astro:after-swap', stopLoader);
+        document.addEventListener('astro:page-load', stopLoader); // Ultimate fallback
       }
     </script>
     
