@@ -9,7 +9,7 @@ interface GlitchChipProps {
 
 export default function GlitchChip({ originalText, glitchText, className = "" }: GlitchChipProps) {
   const [state, setState] = useState<'normal' | 'glitch' | 'restored'>('normal');
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = () => {
     if (state !== 'normal') return;

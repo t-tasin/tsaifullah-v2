@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function TarsIdleCard() {
   const [isIdle, setIsIdle] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const parent = containerRef.current?.closest('a');
