@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LivingAvatar from '../components/LivingAvatar';
+---
+
+<Layout title="About | Tasin">
+  <div class="mt-20 mb-32 max-w-6xl mx-auto px-4 lg:px-0 animate-fade-in-up">
+    <a href="/" class="text-sm font-mono text-muted hover:text-accent transition-colors mb-8 inline-block">&larr; Back to Home</a>
+    
+    <div class="flex flex-col lg:flex-row-reverse gap-16 items-center lg:items-start">
+      
+      {/* Living Avatar Sequence */}
+      <div class="w-full lg:w-1/2 shrink-0">
+        <LivingAvatar client:load />
+      </div>
+      
+      <div class="w-full lg:w-1/2 prose prose-invert prose-p:text-muted prose-p:leading-relaxed font-sans max-w-none lg:pt-16">
+        <h1 class="text-3xl font-bold text-foreground mb-6 font-mono tracking-tight">About</h1>
+        
+        <p>
+          I'm K.M. Khalid Saifullah, though I go by Tasin. I'm a product engineer with a background in research, currently focusing on building robust, scalable systems that solve tangible problems.
+        </p>
+        
+        <p>
+          My work sits at the intersection of product intuition and backend architecture. I don't just write code; I look at the entire lifecycle of a problem—from understanding the user's friction points to architecting the dual-database synchronization required to fix them.
+        </p>
+        
+        <p>
+          Recently, my focus has been on leveraging local LLMs and vector search (`pgvector`) to build context-aware automation that respects privacy and scales elegantly. When I'm not building enterprise tools, I'm probably tweaking T.A.R.S, my self-hosted ambient assistant.
+        </p>
+        
+        <div class="mt-8 border-t border-border pt-8 font-mono text-sm">
+          <h3 class="text-foreground mb-4">Currently</h3>
+          <ul class="text-muted flex flex-col gap-2">
+            <li><span class="text-accent">&rarr;</span> Shipping AtlasDesk SaaS</li>
+            <li><span class="text-accent">&rarr;</span> Building ambient automation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

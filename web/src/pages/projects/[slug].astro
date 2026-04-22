@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const projectEntries = await getCollection('projects');
+  return projectEntries.map(entry => ({
+    params: { slug: entry.slug }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<Layout title={`${entry.data.title} | Tasin`}>
+  <article class="mt-20 mb-32 animate-fade-in-up">
+    <header class="mb-12">
+      <div class="flex flex-wrap items-end gap-6 justify-between border-b border-border pb-6 mb-6">
+        <div>
+          <a href="/" class="text-sm font-mono text-muted hover:text-accent transition-colors mb-4 inline-block">&larr; Back</a>
+          <h1 class="text-4xl sm:text-5xl font-bold text-foreground tracking-tight">{entry.data.title}</h1>
+        </div>
+        <div class="flex flex-col items-end gap-2 text-right">
+          <span class="font-mono text-sm text-accent">{entry.data.status}</span>
+          <span class="font-mono text-xs text-muted">Role: {entry.data.role}</span>
+          {entry.data.users && <span class="font-mono text-xs text-muted">Scale: {entry.data.users}</span>}
+        </div>
+      </div>
+      <p class="text-xl text-muted leading-relaxed font-sans max-w-3xl">
+        {entry.data.description}
+      </p>
+      <div class="mt-6 flex flex-wrap gap-2 font-mono text-xs">
+        {entry.data.stack.map((tech: string) => (
+          <span class="px-2 py-1 border border-border text-muted bg-surface/50">{tech}</span>
+        ))}
+      </div>
+    </header>
+
+    <div class="prose prose-invert prose-headings:font-sans prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-li:text-muted max-w-none">
+      <Content />
+    </div>
+  </article>
+</Layout>

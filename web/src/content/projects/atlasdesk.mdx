@@ -1,0 +1,44 @@
+---
+title: "AtlasDesk"
+description: "Production ITSM platform for higher-ed + mid-market institutions."
+role: "Solo Product Engineer"
+status: "Production"
+users: "3000+"
+stack: ["NestJS", "Next.js", "PostgreSQL", "SQL Server", "pgvector"]
+order: 1
+---
+
+import AtlasDeskDemo from '../../components/demos/AtlasDeskDemo';
+
+<div className="my-12">
+  <AtlasDeskDemo client:load />
+</div>
+
+## The Problem
+
+Campus IT departments juggle physical assets, support tickets, and identity management across disjointed legacy systems. They needed a unified platform that natively understood their organizational hierarchy without forcing them into rigid, developer-defined roles.
+
+## What it Does
+
+- **SAML SSO & Identity Sync** · Deep integration with Microsoft Entra ID, including JIT provisioning and nightly delta syncs.
+- **No-code Permission Matrix** · Allows admins to define multi-role union semantics (max hierarchy, OR booleans, most-permissive scope) via a UI, not code.
+- **AI Resolution Copilot** · Embeds local `pgvector` RAG over historical tickets to suggest fixes before an agent even begins typing.
+- **Dual-Database Architecture** · Reads and writes synchronously across PostgreSQL and a legacy SQL Server 2022 instance, guaranteeing consistency via application-layer `SELECT ... FOR UPDATE` and validation triggers.
+
+## Architecture
+
+*(Architecture diagram placeholder: replace with actual 16:9 diagram later)*
+<div className="w-full aspect-video border border-dashed border-border flex items-center justify-center text-muted font-mono bg-surface mb-12">
+  [Architecture Diagram]
+</div>
+
+## Stack Deep-Dive
+
+- **Identity Layer:** Microsoft Entra ID, argon2id (for fallback OTP), JWT with refresh-token rotation.
+- **App Layer:** NestJS microservices (ticket, asset, reservation), Next.js React frontend.
+- **Data Layer:** PostgreSQL (primary), SQL Server 2022 (legacy sync), Prisma ORM.
+- **AI Layer:** pgvector, transformers.js (BGE-small), Gemini 2.5 Flash.
+
+## Outcome
+
+Currently in production at **The College of Wooster**, managing **3000+ real users**. A multi-tenant SaaS tier (`atlasdesk.app`) is shipping next.

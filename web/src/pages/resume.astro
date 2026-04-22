@@ -1,0 +1,105 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Resume | Tasin">
+  <div class="mt-20 mb-32 max-w-3xl mx-auto animate-fade-in-up">
+    <div class="flex justify-between items-end mb-12 border-b border-border pb-6">
+      <div>
+        <a href="/" class="text-sm font-mono text-muted hover:text-accent transition-colors mb-8 inline-block">&larr; Back to Home</a>
+        <h1 class="text-3xl font-bold text-foreground font-mono tracking-tight">Resume</h1>
+      </div>
+      <a href="/resume.pdf" class="font-mono text-sm px-4 py-2 bg-surface border border-border hover:border-accent hover:text-accent transition-colors">
+        Download PDF &darr;
+      </a>
+    </div>
+    
+    <div class="space-y-16 font-sans">
+      
+      <section>
+        <h2 class="text-sm font-mono text-accent mb-6 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">Experience</h2>
+        <div class="space-y-8 pl-12 border-l border-border/30">
+          
+          <div class="relative">
+            <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-accent"></div>
+            <div class="flex flex-wrap justify-between items-baseline mb-2">
+              <h3 class="text-lg font-bold text-foreground">Software Engineering Intern</h3>
+              <span class="font-mono text-sm text-muted">2024</span>
+            </div>
+            <div class="text-muted text-sm font-mono mb-4">Company Name</div>
+            <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
+              <li>Built backend microservices using NestJS and PostgreSQL.</li>
+              <li>Integrated SAML SSO with Entra ID.</li>
+            </ul>
+          </div>
+          
+          <div class="relative">
+            <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-border"></div>
+            <div class="flex flex-wrap justify-between items-baseline mb-2">
+              <h3 class="text-lg font-bold text-foreground">Backend Developer Intern</h3>
+              <span class="font-mono text-sm text-muted">2023</span>
+            </div>
+            <div class="text-muted text-sm font-mono mb-4">Company Name</div>
+            <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
+              <li>Optimized SQL queries reducing latency by 40%.</li>
+            </ul>
+          </div>
+          
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-sm font-mono text-accent mb-6 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">Education</h2>
+        <div class="space-y-8 pl-12 border-l border-border/30">
+          <div class="relative">
+            <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-border"></div>
+            <div class="flex flex-wrap justify-between items-baseline mb-2">
+              <h3 class="text-lg font-bold text-foreground">The College of Wooster</h3>
+              <span class="font-mono text-sm text-muted">2021 – 2025</span>
+            </div>
+            <div class="text-muted text-sm font-mono mb-4">Bachelor of Arts in Computer Science</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-sm font-mono text-accent mb-6 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">Skills</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 font-mono text-sm text-muted">
+          <div>
+            <div class="text-foreground mb-2">Languages</div>
+            <ul class="space-y-1">
+              <li>TypeScript</li>
+              <li>Python</li>
+              <li>SQL</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-foreground mb-2">Frameworks</div>
+            <ul class="space-y-1">
+              <li>NestJS</li>
+              <li>Next.js / React</li>
+              <li>Astro</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-foreground mb-2">Data / Ops</div>
+            <ul class="space-y-1">
+              <li>PostgreSQL</li>
+              <li>SQL Server</li>
+              <li>Docker</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-foreground mb-2">Auth / Identity</div>
+            <ul class="space-y-1">
+              <li>SAML SSO</li>
+              <li>Entra ID</li>
+              <li>OAuth2</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</Layout>

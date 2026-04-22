@@ -1,0 +1,146 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AnimatedName from '../components/AnimatedName';
+import GlitchChip from '../components/GlitchChip';
+import TarsIdleCard from '../components/TarsIdleCard';
+import LivingAvatar from '../components/LivingAvatar';
+---
+
+<Layout title="Tasin | Software Engineer & Researcher">
+  <section class="mt-20 mb-32 animate-fade-in-up relative">
+    
+    <div class="relative z-10 max-w-2xl">
+      <AnimatedName client:load />
+      
+      <div class="mt-8 text-lg sm:text-xl text-muted leading-relaxed font-sans">
+        <p>
+          I solve problems I've witnessed. With strong product instinct and engineering chops, I use AI efficiently to ship enterprise software. 
+          Most recently, I built an ITSM platform handling <GlitchChip client:visible originalText="3000+ real users" glitchText="[ERR: DROP TABLE users;]" className="mx-1" /> 
+          with real enterprise auth.
+        </p>
+      </div>
+    </div>
+
+    {/* Background Swarm Overlay */}
+    <div class="absolute top-[100px] md:top-[-80px] right-[-20px] md:right-[-80px] w-[300px] md:w-[450px] h-[300px] md:h-[450px] z-0 opacity-20 md:opacity-40 pointer-events-none">
+      <LivingAvatar client:load />
+    </div>
+  </section>
+
+  <section class="mb-24 animate-fade-in-up" style="animation-delay: 100ms;">
+    <h2 class="text-sm font-mono text-accent mb-8 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">01. Selected Work</h2>
+    
+    <div class="grid grid-cols-1 gap-8">
+      {/* AtlasDesk Card */}
+      <a href="/projects/atlasdesk" class="group block relative border border-border bg-surface/50 p-8 hover:border-accent/50 transition-colors">
+        <div class="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div class="relative z-10 flex flex-col md:flex-row gap-8 justify-between items-start">
+          <div class="max-w-xl">
+            <h3 class="text-2xl font-bold text-foreground mb-4 group-hover:text-accent transition-colors">AtlasDesk</h3>
+            <p class="text-muted leading-relaxed mb-6">
+              Production ITSM platform for higher-ed + mid-market institutions. Live at Wooster College. 
+              No-code permission matrix with hierarchy tiers, runtime-editable status machines, and an AI Resolution Copilot.
+            </p>
+            <div class="flex flex-wrap gap-2 font-mono text-xs mt-4">
+              <GlitchChip client:visible originalText="3000+ users" glitchText="[ERR: CONNECTION_LOST]" />
+              <span class="px-2 py-1 border border-border text-muted">SAML SSO</span>
+              <span class="px-2 py-1 border border-border text-muted">pgvector RAG</span>
+              <span class="px-2 py-1 border border-border text-muted">NestJS</span>
+              <span class="px-2 py-1 border border-border text-muted">Dual-DB</span>
+            </div>
+          </div>
+          <div class="hidden md:block w-32 h-32 border border-dashed border-border flex items-center justify-center text-muted font-mono text-xs opacity-50 group-hover:opacity-100 transition-opacity">
+            [Demo Loop]
+          </div>
+        </div>
+      </a>
+
+      {/* T.A.R.S Card */}
+      <a href="/projects/tars" class="group block relative border border-border bg-surface/50 p-8 hover:border-accent/50 transition-colors">
+        <div class="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div class="relative z-10 flex flex-col md:flex-row gap-8 justify-between items-start">
+          <div class="max-w-xl">
+            <h3 class="text-2xl font-bold text-foreground mb-4 group-hover:text-accent transition-colors">T.A.R.S</h3>
+            <TarsIdleCard client:visible />
+            <div class="flex flex-wrap gap-2 font-mono text-xs mt-4">
+              <span class="px-2 py-1 border border-border text-foreground">Always On</span>
+              <span class="px-2 py-1 border border-border text-muted">Ambient Automation</span>
+              <span class="px-2 py-1 border border-border text-muted">Local LLM</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="mb-24 animate-fade-in-up" style="animation-delay: 200ms;">
+    <h2 class="text-sm font-mono text-accent mb-8 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">02. Research</h2>
+    
+    <div class="flex flex-col gap-6">
+      <div class="border-l-2 border-border pl-6 py-2 hover:border-accent transition-colors">
+        <div class="flex justify-between items-baseline gap-4 mb-2">
+          <h3 class="text-lg font-medium text-foreground"><a href="#" class="link-hover">Multi-Agent Coordination in Autonomous Vehicle Routing: A Simulation-Based Study</a></h3>
+          <span class="font-mono text-xs text-muted shrink-0">2025</span>
+        </div>
+        <p class="text-sm text-muted mb-2">Under review. Author: KM Khalid Saifullah.</p>
+        <p class="font-mono text-xs text-accent/80">Keywords: Autonomous Vehicles, Multi-Agent Systems, V2V Communication, Dynamic Rerouting.</p>
+      </div>
+
+      <div class="border-l-2 border-border pl-6 py-2 hover:border-accent transition-colors">
+        <div class="flex justify-between items-baseline gap-4 mb-2">
+          <h3 class="text-lg font-medium text-foreground"><a href="#" class="link-hover">Sentiment Analysis in Software Engineering: Evaluating Generative Pre-trained Transformers</a></h3>
+          <span class="font-mono text-xs text-muted shrink-0">NCUR 2024</span>
+        </div>
+        <p class="text-sm text-muted mb-2">Published. Benchmarks GPT-4o-mini vs BERT on GitHub / Stack Overflow / Jira.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-24 animate-fade-in-up" style="animation-delay: 300ms;">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+      <div>
+        <h2 class="text-sm font-mono text-accent mb-8 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">03. Experience</h2>
+        <ul class="flex flex-col gap-6">
+          <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-border hover:before:bg-accent before:transition-colors">
+            <h4 class="text-foreground font-medium mb-1">Software Engineering Intern</h4>
+            <div class="text-sm text-muted font-mono flex justify-between">
+              <span>Company Name</span>
+              <span>2024</span>
+            </div>
+          </li>
+          <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-border hover:before:bg-accent before:transition-colors">
+            <h4 class="text-foreground font-medium mb-1">Backend Developer Intern</h4>
+            <div class="text-sm text-muted font-mono flex justify-between">
+              <span>Company Name</span>
+              <span>2023</span>
+            </div>
+          </li>
+        </ul>
+        <div class="mt-8">
+          <a href="/resume" class="text-sm font-mono text-accent hover:text-foreground transition-colors border-b border-accent/30 pb-1">View full resume &rarr;</a>
+        </div>
+      </div>
+      
+      <div>
+        <h2 class="text-sm font-mono text-accent mb-8 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">04. Leadership</h2>
+        <ul class="flex flex-col gap-6">
+          <li class="text-sm">
+            <span class="text-foreground font-medium">Google Developer Student Club</span> 
+            <span class="text-muted mx-2">—</span> 
+            <span class="text-muted">Co-Lead, The College of Wooster, 2023–2025. Led workshops + hackathons for 100+ students.</span>
+          </li>
+          <li class="text-sm">
+            <span class="text-foreground font-medium">Stanford TreeHacks 2024</span> 
+            <span class="text-muted mx-2">—</span> 
+            <span class="text-muted">Participant, 36-hour hackathon.</span>
+          </li>
+          <li class="text-sm">
+            <span class="text-foreground font-medium">Residential Assistant</span> 
+            <span class="text-muted mx-2">—</span> 
+            <span class="text-muted">The College of Wooster, 2022–2024. Mentored 50+ residents.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Layout>

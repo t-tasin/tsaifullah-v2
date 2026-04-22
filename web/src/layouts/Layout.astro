@@ -1,0 +1,188 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ViewTransitions />
+  </head>
+  <body class="min-h-screen bg-background schematic-bg flex flex-col relative overflow-x-hidden">
+    
+    {/* Npm Loader Overlay */}
+    <div id="npm-loader" class="fixed inset-0 bg-background z-50 flex flex-col font-mono text-xs p-6 overflow-hidden pointer-events-none opacity-0 transition-opacity duration-200">
+      <div class="text-accent mb-4">tsaifullah@portfolio ~ % npm install</div>
+      <div id="npm-logs" class="flex flex-col gap-1 text-muted h-full w-full mask-image-b relative"></div>
+    </div>
+
+    <script is:inline>
+      const fakeLogs = [
+        "npm WARN deprecated request@2.88.2: request has been deprecated",
+        "npm WARN deprecated har-validator@5.1.5: this library is no longer supported",
+        "npm WARN deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.",
+        "npm verb cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'install' ]",
+        "npm info using npm@10.2.4",
+        "npm info using node@v20.10.0",
+        "npm http fetch GET 200 https://registry.npmjs.org/framer-motion 45ms",
+        "npm http fetch GET 200 https://registry.npmjs.org/react 32ms",
+        "npm http fetch GET 200 https://registry.npmjs.org/tailwindcss 60ms",
+        "npm info build /Users/tasin/portfolio/node_modules/esbuild",
+        "> esbuild@0.20.2 postinstall /Users/tasin/portfolio/node_modules/esbuild",
+        "> node install.js",
+        "npm ERR! code EACCES",
+        "npm ERR! syscall open",
+        "npm ERR! path /Users/tasin/portfolio/node_modules/esbuild/package.json.3498274",
+        "npm ERR! errno -13",
+        "npm ERR! Error: EACCES: permission denied, open '/Users/tasin/portfolio/node_modules/esbuild/package.json.3498274'",
+        "npm ERR!  [Error: EACCES: permission denied, open '/Users/tasin/portfolio/node_modules/esbuild/package.json.3498274'] {",
+        "npm ERR!   errno: -13,",
+        "npm ERR!   code: 'EACCES',",
+        "npm ERR!   syscall: 'open',",
+        "npm ERR!   path: '/Users/tasin/portfolio/node_modules/esbuild/package.json.3498274'",
+        "npm ERR! }",
+        "npm ERR! ",
+        "npm ERR! The operation was rejected by your operating system.",
+        "npm ERR! It is likely you do not have the permissions to access this file as the current user",
+        "npm ERR! ",
+        "npm ERR! If you believe this might be a permissions issue, please double-check the",
+        "npm ERR! permissions of the file and its containing directories, or try running",
+        "npm ERR! the command again as root/Administrator.",
+        "npm WARN deprecated universe@1.0.0: heat death imminent, please migrate to multiversal-architecture",
+        "npm http fetch GET 500 https://registry.npmjs.org/left-pad 104ms",
+        "npm ERR! code E500",
+        "npm ERR! 500 Internal Server Error - GET https://registry.npmjs.org/left-pad",
+        "npm verb stack Error: 500 Internal Server Error - GET https://registry.npmjs.org/left-pad",
+        "npm WARN tar zlib error: unexpected end of file",
+        "npm ERR! cb() never called!",
+        "npm ERR! This is an error with npm itself. Please report this error at:",
+        "npm ERR!     <https://github.com/npm/cli/issues>",
+        "Segmentation fault (core dumped)",
+        "kernel panic - not syncing: Fatal exception in interrupt",
+        "Rebooting in 3 seconds...",
+        "Just kidding. Resuming...",
+        "added 432 packages, and audited 433 packages in 3s",
+        "56 packages are looking for funding",
+        "  run `npm fund` for details",
+        "found 0 vulnerabilities"
+      ];
+
+      function startLoader() {
+        const loader = document.getElementById('npm-loader');
+        const logsContainer = document.getElementById('npm-logs');
+        if (!loader || !logsContainer) return;
+        
+        loader.style.opacity = '1';
+        logsContainer.innerHTML = '';
+        
+        let index = 0;
+        const interval = setInterval(() => {
+          if (index >= fakeLogs.length) {
+            clearInterval(interval);
+            return;
+          }
+          
+          const logEntry = document.createElement('div');
+          const text = fakeLogs[index];
+          
+          if (text.includes('WARN')) {
+            logEntry.className = 'text-yellow-500';
+            logEntry.innerHTML = `<span class="bg-yellow-500/20 px-1 mr-2">WARN</span> ${text.replace('npm WARN ', '')}`;
+          } else if (text.includes('ERR!')) {
+            logEntry.className = 'text-red-500';
+            logEntry.innerHTML = `<span class="bg-red-500/20 px-1 mr-2">ERR!</span> ${text.replace('npm ERR! ', '')}`;
+          } else if (text.startsWith('>')) {
+            logEntry.className = 'text-foreground';
+            logEntry.textContent = text;
+          } else if (text.includes('Segmentation fault') || text.includes('kernel panic')) {
+            logEntry.className = 'text-red-600 font-bold bg-red-900/20';
+            logEntry.textContent = text;
+          } else {
+            logEntry.textContent = text;
+          }
+          
+          logsContainer.appendChild(logEntry);
+          logsContainer.scrollTop = logsContainer.scrollHeight;
+          index++;
+        }, 30); // 30ms * ~50 logs = 1.5 seconds
+        
+        window._npmLoaderInterval = interval;
+      }
+
+      function stopLoader() {
+        const loader = document.getElementById('npm-loader');
+        if (!loader) return;
+        
+        if (window._npmLoaderInterval) clearInterval(window._npmLoaderInterval);
+        loader.style.opacity = '0';
+      }
+
+      // Intercept Astro navigation to force the loader to display for 1.8 seconds
+      document.addEventListener('astro:before-preparation', (ev) => {
+        ev.preventDefault(); // Pause the navigation
+        
+        const originalLoader = document.getElementById('npm-loader');
+        if(originalLoader) originalLoader.style.transition = 'none'; 
+        startLoader();
+        
+        // Resume navigation after 1800ms
+        setTimeout(() => {
+          ev.loader();
+        }, 1800);
+      });
+
+      document.addEventListener('astro:after-swap', () => {
+        const loader = document.getElementById('npm-loader');
+        if(loader) {
+          loader.style.transition = 'opacity 0.2s ease-out';
+          loader.style.opacity = '1';
+          setTimeout(stopLoader, 100); 
+        }
+      });
+    </script>
+    
+    <!-- Subtle fade out at the top/bottom for the grid -->
+    <div class="fixed inset-0 pointer-events-none bg-gradient-to-b from-background via-transparent to-background z-[-1]"></div>
+    
+    <header class="w-full max-w-4xl mx-auto px-6 py-12 flex justify-between items-center z-10">
+      <a href="/" class="text-xl font-bold font-mono tracking-tight group flex items-center gap-2">
+        <span class="text-accent group-hover:animate-pulse">ts</span>
+        <span class="text-muted group-hover:text-foreground transition-colors">/</span>
+      </a>
+      <nav class="flex gap-6 text-sm font-mono text-muted">
+        <a href="/" class="hover:text-accent transition-colors">Home</a>
+        <a href="/projects/atlasdesk" class="hover:text-accent transition-colors">AtlasDesk</a>
+        <a href="/resume" class="hover:text-accent transition-colors">Resume</a>
+        <a href="/about" class="hover:text-accent transition-colors">About</a>
+      </nav>
+    </header>
+
+    <main class="flex-grow w-full max-w-4xl mx-auto px-6 z-10">
+      <slot />
+    </main>
+
+    <footer class="w-full max-w-4xl mx-auto px-6 py-12 mt-24 border-t border-border/50 text-sm font-mono text-muted z-10">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <p>&copy; {new Date().getFullYear()} Tasin (K.M. Khalid Saifullah)</p>
+        <div class="flex gap-4">
+          <a href="#" class="hover:text-accent transition-colors">Email</a>
+          <a href="#" class="hover:text-accent transition-colors">LinkedIn</a>
+          <a href="#" class="hover:text-accent transition-colors">GitHub</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+---
+title: "T.A.R.S"
+description: "Personal AI assistant handling ambient automation across my life."
+role: "Creator"
+status: "Active Development"
+stack: ["Local LLMs", "Python", "Home Assistant", "FastAPI"]
+order: 2
+---
+
+import TARSDemo from '../../components/demos/TARSDemo';
+
+<div className="my-12">
+  <TARSDemo client:load />
+</div>
+
+## The Problem
+
+I wanted a "second brain" that didn't just store information, but actively worked for me. Existing voice assistants are limited to basic commands and lack context about my ongoing projects, communications, and daily routines.
+
+## What it Does
+
+T.A.R.S is a continuously running background service on my home server. It listens for ambient triggers—calendar events, emails, sensor data—and takes proactive action using local LLM inference.
+
+- **Contextual Awareness** · Summarizes threads and drafts prep notes before meetings.
+- **Ambient Automation** · Controls physical environment (lights, displays) based on focus state.
+- **Private by Default** · Runs locally on my apartment server without sending sensitive personal data to external APIs.
+
+## Architecture
+
+*(Architecture diagram placeholder)*
+<div className="w-full aspect-video border border-dashed border-border flex items-center justify-center text-muted font-mono bg-surface mb-12">
+  [T.A.R.S Architecture]
+</div>
+
+## Outcome
+
+In active development and used daily. It has reduced my manual task-switching overhead and acts as a true automated assistant.
