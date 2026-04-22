@@ -117,7 +117,7 @@ const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
           logsContainer.appendChild(logEntry);
           logsContainer.scrollTop = logsContainer.scrollHeight;
           index++;
-        }, 30); // 30ms * ~50 logs = 1.5 seconds
+        }, 8); // Extremely fast logs: 8ms * ~50 logs = 400ms
         
         window._npmLoaderInterval = interval;
       }
@@ -130,28 +130,36 @@ const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
         loader.style.opacity = '0';
       }
 
-      // Intercept Astro navigation to force the loader to display for 1.8 seconds
-      document.addEventListener('astro:before-preparation', (ev) => {
-        ev.preventDefault(); // Pause the navigation
-        
-        const originalLoader = document.getElementById('npm-loader');
-        if(originalLoader) originalLoader.style.transition = 'none'; 
-        startLoader();
-        
-        // Resume navigation after 1800ms
-        setTimeout(() => {
-          ev.loader();
-        }, 1800);
-      });
+      // Prevent duplicate event listeners on page swap
+      if (!window._npmLoaderInit) {
+        window._npmLoaderInit = true;
 
-      document.addEventListener('astro:after-swap', () => {
-        const loader = document.getElementById('npm-loader');
-        if(loader) {
-          loader.style.transition = 'opacity 0.2s ease-out';
-          loader.style.opacity = '1';
-          setTimeout(stopLoader, 100); 
-        }
-      });
+        // Intercept Astro navigation to force the loader to display briefly
+        document.addEventListener('astro:before-preparation', (ev) => {
+          // If we're just navigating to a hash on the same page, don't show the loader
+          if (ev.to.pathname === window.location.pathname) return;
+
+          ev.preventDefault(); // Pause the navigation
+          
+          const originalLoader = document.getElementById('npm-loader');
+          if(originalLoader) originalLoader.style.transition = 'none'; 
+          startLoader();
+          
+          // Resume navigation after 500ms for a snappy transition
+          setTimeout(() => {
+            ev.loader();
+          }, 500);
+        });
+
+        document.addEventListener('astro:after-swap', () => {
+          const loader = document.getElementById('npm-loader');
+          if(loader) {
+            loader.style.transition = 'opacity 0.2s ease-out';
+            loader.style.opacity = '1';
+            setTimeout(stopLoader, 50); 
+          }
+        });
+      }
     </script>
     
     <!-- Subtle fade out at the top/bottom for the grid -->
