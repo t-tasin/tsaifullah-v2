@@ -13,38 +13,105 @@ import Layout from '../layouts/Layout.astro';
         Download PDF &darr;
       </a>
     </div>
-    
+
     <div class="space-y-16 font-sans">
-      
+
       <section>
         <h2 class="text-sm font-mono text-accent mb-6 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">Experience</h2>
-        <div class="space-y-8 pl-12 border-l border-border/30">
-          
+        <div class="space-y-10 pl-12 border-l border-border/30">
+
           <div class="relative">
             <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-accent"></div>
-            <div class="flex flex-wrap justify-between items-baseline mb-2">
-              <h3 class="text-lg font-bold text-foreground">Software Engineering Intern</h3>
-              <span class="font-mono text-sm text-muted">2024</span>
+            <div class="flex flex-wrap justify-between items-baseline mb-2 gap-2">
+              <h3 class="text-lg font-bold text-foreground">Lead Software Engineer & Architect</h3>
+              <span class="font-mono text-sm text-muted">Oct 2025 — Present</span>
             </div>
-            <div class="text-muted text-sm font-mono mb-4">Company Name</div>
+            <div class="text-muted text-sm font-mono mb-4">AtlasDesk · Wooster, OH</div>
             <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
-              <li>Built backend microservices using NestJS and PostgreSQL.</li>
-              <li>Integrated SAML SSO with Entra ID.</li>
+              <li>Architected, built, and deployed a production ITSM SaaS platform — 7 NestJS microservices with SAML SSO, async job queues, and RAG-based ticket routing — replacing a licensed commercial product at The College of Wooster. Serves 4,000+ active users in a community of 35,000.</li>
+              <li>Identified the market gap by analyzing 500+ historical tickets and interviewing 16 IT staff; secured executive buy-in and unanimous approval from 4 divisional directors to replace the legacy TopDesk platform.</li>
+              <li>Integrated SAML 2.0 SSO with Microsoft Entra ID for institutional compliance. Built a local RAG pipeline (pgvector + BGE embeddings + Gemini 2.5 Flash) that reduced ticket creation time by ~87.5%.</li>
+              <li>Load-tested with k6 across smoke, spike, stress, and soak profiles: sustained P95 latency under 20ms at 50 concurrent users over a 30-minute soak; identified capacity ceiling at 500 VU for next-iteration hardening.</li>
+              <li>Shipped CI/CD via GitHub Actions (smoke, unit tests, container build, registry push on every commit); coordinated on-prem deployment on SUSE Linux with campus system administrators.</li>
+              <li>Achieved 40% ticket, 70% reservation, and 100% asset adoption in two weeks with no formal training sessions. Estimated $33.5K annual savings ($20K license retirement + $13.5K operational efficiency).</li>
             </ul>
           </div>
-          
+
+          <div class="relative">
+            <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-accent"></div>
+            <div class="flex flex-wrap justify-between items-baseline mb-2 gap-2">
+              <h3 class="text-lg font-bold text-foreground">IT Specialist, Solutions Architect</h3>
+              <span class="font-mono text-sm text-muted">Jul 2025 — Present</span>
+            </div>
+            <div class="text-muted text-sm font-mono mb-4">The College of Wooster · Wooster, OH</div>
+            <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
+              <li>Resolved 500+ support tickets with 90% user satisfaction — the operational insight that led to designing and building AtlasDesk.</li>
+              <li>Built a ticket-classification system using MiniLM embeddings for automatic routing across Wooster-specific categories.</li>
+              <li>Automated OS installation and AD domain binding for 200+ lab computers via PowerShell, cutting a 4–5 hour weekly task to 10 minutes (96% reduction).</li>
+              <li>Leading the AtlasDesk pilot integration into production IT infrastructure, coordinating with 12 IT staff and 14 student technicians on migration from legacy TopDesk.</li>
+            </ul>
+          </div>
+
           <div class="relative">
             <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-border"></div>
-            <div class="flex flex-wrap justify-between items-baseline mb-2">
-              <h3 class="text-lg font-bold text-foreground">Backend Developer Intern</h3>
-              <span class="font-mono text-sm text-muted">2023</span>
+            <div class="flex flex-wrap justify-between items-baseline mb-2 gap-2">
+              <h3 class="text-lg font-bold text-foreground">Data Scientist Intern</h3>
+              <span class="font-mono text-sm text-muted">May — Jul 2024</span>
             </div>
-            <div class="text-muted text-sm font-mono mb-4">Company Name</div>
+            <div class="text-muted text-sm font-mono mb-4">Schneider Electric · Louisville, KY</div>
             <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
-              <li>Optimized SQL queries reducing latency by 40%.</li>
+              <li>Prototyped an LLM-driven co-pilot (LlamaIndex, FastAPI) over 250,000+ internal workflows, enabling natural-language queries on complex energy data.</li>
+              <li>Designed a Model Context Protocol client–server architecture integrating 15+ external tools via automatic schema discovery.</li>
+              <li>Contributed to a team benchmarking 13 LLMs (GPT-4, Claude, Llama) across single- and multi-agent architectures using GPT-4-as-judge evaluation.</li>
             </ul>
           </div>
-          
+
+          <div class="relative">
+            <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-border"></div>
+            <div class="flex flex-wrap justify-between items-baseline mb-2 gap-2">
+              <h3 class="text-lg font-bold text-foreground">Software Engineer Intern</h3>
+              <span class="font-mono text-sm text-muted">May — Dec 2023</span>
+            </div>
+            <div class="text-muted text-sm font-mono mb-4">Jomee Jomaa Inc. · Wilmington, DE</div>
+            <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
+              <li>Optimized 30+ Django REST APIs and PostgreSQL queries, lifting Lighthouse performance from 72% to 96%.</li>
+              <li>Contributed to Stripe payment integration and implemented JWT with rotating refresh tokens across 10,000+ user accounts.</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-sm font-mono text-accent mb-6 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">Selected Projects</h2>
+        <div class="space-y-10 pl-12 border-l border-border/30">
+
+          <div class="relative">
+            <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-border"></div>
+            <div class="flex flex-wrap justify-between items-baseline mb-2 gap-2">
+              <h3 class="text-lg font-bold text-foreground">ReviewBuddy — AI GitHub App</h3>
+              <span class="font-mono text-sm text-muted">2025</span>
+            </div>
+            <div class="text-muted text-sm font-mono mb-4">TypeScript · Next.js · Prisma · PostgreSQL · BullMQ · Gemini API</div>
+            <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
+              <li>AI GitHub App automating code review on a 30,000+ line codebase via live webhooks and line-specific PR comments.</li>
+              <li>PostgreSQL cache keyed on file-content hashes cut review latency 88% (10.1s → 1.2s) and per-review cost from $0.12 to $0.014.</li>
+            </ul>
+          </div>
+
+          <div class="relative">
+            <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-border"></div>
+            <div class="flex flex-wrap justify-between items-baseline mb-2 gap-2">
+              <h3 class="text-lg font-bold text-foreground">Multi-Agent Coordination for Autonomous Vehicles</h3>
+              <span class="font-mono text-sm text-muted">2024 — 2025</span>
+            </div>
+            <div class="text-muted text-sm font-mono mb-4">Departmental Honors Research · Python · Multi-agent RL · Simulation</div>
+            <ul class="list-disc pl-4 space-y-2 text-muted leading-relaxed">
+              <li>Identified a V2X "routing-loop" failure mode in autonomous-vehicle coordination where inter-vehicle communication degraded performance.</li>
+              <li>Designed an Object Memory Management framework that reduced coordination delay by 75.7% and wait time by 88%. Presented at NCUR 2025.</li>
+            </ul>
+          </div>
+
         </div>
       </section>
 
@@ -53,11 +120,12 @@ import Layout from '../layouts/Layout.astro';
         <div class="space-y-8 pl-12 border-l border-border/30">
           <div class="relative">
             <div class="absolute -left-[53px] top-1.5 w-2 h-2 bg-border"></div>
-            <div class="flex flex-wrap justify-between items-baseline mb-2">
+            <div class="flex flex-wrap justify-between items-baseline mb-2 gap-2">
               <h3 class="text-lg font-bold text-foreground">The College of Wooster</h3>
-              <span class="font-mono text-sm text-muted">2021 – 2025</span>
+              <span class="font-mono text-sm text-muted">2021 — 2025</span>
             </div>
-            <div class="text-muted text-sm font-mono mb-4">Bachelor of Arts in Computer Science</div>
+            <div class="text-muted text-sm font-mono mb-2">B.A. in Computer Science & Business Economics</div>
+            <p class="text-muted text-sm leading-relaxed">Departmental Honors in Computer Science. Co-Lead, Google Developer Student Club. Stanford TreeHacks 2024 Participant.</p>
           </div>
         </div>
       </section>
@@ -69,8 +137,10 @@ import Layout from '../layouts/Layout.astro';
             <div class="text-foreground mb-2">Languages</div>
             <ul class="space-y-1">
               <li>TypeScript</li>
+              <li>JavaScript</li>
               <li>Python</li>
               <li>SQL</li>
+              <li>C++</li>
             </ul>
           </div>
           <div>
@@ -78,6 +148,8 @@ import Layout from '../layouts/Layout.astro';
             <ul class="space-y-1">
               <li>NestJS</li>
               <li>Next.js / React</li>
+              <li>FastAPI</li>
+              <li>Django</li>
               <li>Astro</li>
             </ul>
           </div>
@@ -85,16 +157,20 @@ import Layout from '../layouts/Layout.astro';
             <div class="text-foreground mb-2">Data / Ops</div>
             <ul class="space-y-1">
               <li>PostgreSQL</li>
-              <li>SQL Server</li>
-              <li>Docker</li>
+              <li>SQL Server 2022</li>
+              <li>Redis · BullMQ</li>
+              <li>pgvector</li>
+              <li>Docker · GitHub Actions</li>
             </ul>
           </div>
           <div>
-            <div class="text-foreground mb-2">Auth / Identity</div>
+            <div class="text-foreground mb-2">Auth / AI</div>
             <ul class="space-y-1">
-              <li>SAML SSO</li>
-              <li>Entra ID</li>
-              <li>OAuth2</li>
+              <li>SAML 2.0 · Entra ID</li>
+              <li>OAuth2 · JWT</li>
+              <li>RAG · Embeddings</li>
+              <li>LlamaIndex · Gemini</li>
+              <li>MCP</li>
             </ul>
           </div>
         </div>

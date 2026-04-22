@@ -4,9 +4,32 @@ import AnimatedName from '../components/AnimatedName';
 import GlitchChip from '../components/GlitchChip';
 import TarsIdleCard from '../components/TarsIdleCard';
 import LivingAvatar from '../components/LivingAvatar';
+
+const research = [
+  {
+    title: "Multi-Agent Coordination in Autonomous Vehicle Routing: A Simulation-Based Study",
+    authors: ["KM Khalid Saifullah"],
+    venue: "Research Paper",
+    year: "2025",
+    status: "Published",
+    abstract: "This study explores how multi-agent interaction enhances autonomous vehicle (AV) decision-making in dynamic traffic environments. While traditional AV models focus on individual autonomy, real-world traffic scenarios often require collective behavior through inter-agent communication and coordination. To investigate this, we developed a graph-based simulation environment that enables vehicle agents to exchange information and reroute in real time in response to road obstacles. Our findings demonstrate that communication and adaptive rerouting significantly reduce average wait times and improve travel efficiency. Furthermore, we introduce a lightweight memory mechanism—Object Memory Management (OMM)—which allows agents to retain knowledge of previously encountered obstacles. This feature proved critical in avoiding routing loops and redundant decisions. Together, these results highlight the potential of communication- and memory-enhanced agents in creating resilient, cooperative AV systems capable of navigating complex and unpredictable traffic networks.",
+    keywords: ["Autonomous Vehicles", "Multi-Agent Systems", "V2V Communication", "Dynamic Rerouting", "Traffic Simulation"],
+    links: { paper: "/documents/ksaifullah_multiAgent.pdf" }
+  },
+  {
+    title: "Sentiment Analysis in Software Engineering: Evaluating Generative Pre-trained Transformers",
+    authors: ["KM Khalid Saifullah"],
+    venue: "National Conference on Undergraduate Research (NCUR)",
+    year: "2024",
+    status: "Published",
+    abstract: "Sentiment analysis plays a crucial role in understanding developer interactions, issue resolutions, and project dynamics within software engineering (SE). While traditional SE-specific sentiment analysis tools have made significant strides, they often fail to account for the nuanced and context-dependent language inherent to the domain. This study systematically evaluates the performance of bidirectional transformers, such as BERT, against generative pre-trained transformers, specifically GPT-4o-mini, in SE sentiment analysis. Using datasets from GitHub, Stack Overflow, and Jira, we benchmark the models' capabilities with fine-tuned and default configurations. The results reveal that fine-tuned GPT-4o-mini performs comparable to BERT and other bidirectional models on structured and balanced datasets like GitHub and Jira, achieving macro-averaged F1-scores of 0.93 and 0.98, respectively. However, on linguistically complex datasets with imbalanced sentiment distributions, such as Stack Overflow, the default GPT-4o-mini model exhibits superior generalization, achieving an accuracy of 85.3% compared to the fine-tuned model's 13.1%. These findings highlight the trade-offs between fine-tuning and leveraging pre-trained models for SE tasks.",
+    keywords: ["Sentiment Analysis", "Software Engineering", "Transformer Models", "GPT", "BERT", "Fine-tuning", "NLP"],
+    links: { paper: "https://arxiv.org/pdf/2505.14692" }
+  }
+];
 ---
 
-<Layout title="Tasin | Software Engineer & Researcher">
+<Layout title="Tasin | Software Engineer & Architect">
   <section class="mt-20 mb-32 animate-fade-in-up relative">
     
     <div class="relative z-10 max-w-2xl">
@@ -14,9 +37,7 @@ import LivingAvatar from '../components/LivingAvatar';
       
       <div class="mt-8 text-lg sm:text-xl text-muted leading-relaxed font-sans">
         <p>
-          I solve problems I've witnessed. With strong product instinct and engineering chops, I use AI efficiently to ship enterprise software. 
-          Most recently, I built an ITSM platform handling <GlitchChip client:visible originalText="3000+ real users" glitchText="[ERR: DROP TABLE users;]" className="mx-1" /> 
-          with real enterprise auth.
+          I build the things I've watched people quietly route around. Most recently that meant an ITSM platform — now handling <GlitchChip client:visible originalText="4,000+ real users" glitchText="[ERR: DROP TABLE users;]" className="mx-1" /> with real enterprise auth — which I shipped, solo, at the college where I was also the one answering the tickets.
         </p>
       </div>
     </div>
@@ -38,11 +59,10 @@ import LivingAvatar from '../components/LivingAvatar';
           <div class="max-w-xl">
             <h3 class="text-2xl font-bold text-foreground mb-4 group-hover:text-accent transition-colors">AtlasDesk</h3>
             <p class="text-muted leading-relaxed mb-6">
-              Production ITSM platform for higher-ed + mid-market institutions. Live at Wooster College. 
-              No-code permission matrix with hierarchy tiers, runtime-editable status machines, and an AI Resolution Copilot.
+              Production ITSM platform I designed, built, and shipped solo. Live at The College of Wooster — 4,000+ active users, 10,000+ assets. SAML SSO with Entra ID, a no-code permission matrix, and an AI Resolution Copilot built on local pgvector RAG. Retired a $20K/year commercial platform in the process.
             </p>
             <div class="flex flex-wrap gap-2 font-mono text-xs mt-4">
-              <GlitchChip client:visible originalText="3000+ users" glitchText="[ERR: CONNECTION_LOST]" />
+              <GlitchChip client:visible originalText="4,000+ users" glitchText="[ERR: CONNECTION_LOST]" />
               <span class="px-2 py-1 border border-border text-muted">SAML SSO</span>
               <span class="px-2 py-1 border border-border text-muted">pgvector RAG</span>
               <span class="px-2 py-1 border border-border text-muted">NestJS</span>
@@ -61,11 +81,15 @@ import LivingAvatar from '../components/LivingAvatar';
         <div class="relative z-10 flex flex-col md:flex-row gap-8 justify-between items-start">
           <div class="max-w-xl">
             <h3 class="text-2xl font-bold text-foreground mb-4 group-hover:text-accent transition-colors">T.A.R.S</h3>
+            <p class="text-muted leading-relaxed mb-6">
+              Self-hosted ambient assistant running on two mini PCs in my apartment. Tiered model routing keeps most traffic on local Qwen3 and escalates only when the task earns it. A versioned personal wiki plus an approval gate make sure the system remembers what's actually mine, not what it guessed.
+            </p>
             <TarsIdleCard client:visible />
             <div class="flex flex-wrap gap-2 font-mono text-xs mt-4">
               <span class="px-2 py-1 border border-border text-foreground">Always On</span>
-              <span class="px-2 py-1 border border-border text-muted">Ambient Automation</span>
-              <span class="px-2 py-1 border border-border text-muted">Local LLM</span>
+              <span class="px-2 py-1 border border-border text-muted">Self-hosted</span>
+              <span class="px-2 py-1 border border-border text-muted">Tiered Routing</span>
+              <span class="px-2 py-1 border border-border text-muted">Approval-gated</span>
             </div>
           </div>
         </div>
@@ -77,22 +101,33 @@ import LivingAvatar from '../components/LivingAvatar';
     <h2 class="text-sm font-mono text-accent mb-8 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">02. Research</h2>
     
     <div class="flex flex-col gap-6">
-      <div class="border-l-2 border-border pl-6 py-2 hover:border-accent transition-colors">
-        <div class="flex justify-between items-baseline gap-4 mb-2">
-          <h3 class="text-lg font-medium text-foreground"><a href="#" class="link-hover">Multi-Agent Coordination in Autonomous Vehicle Routing: A Simulation-Based Study</a></h3>
-          <span class="font-mono text-xs text-muted shrink-0">2025</span>
+      {research.map((paper) => (
+        <div class="border-l-2 border-border pl-6 py-2 hover:border-accent transition-colors group">
+          <div class="flex justify-between items-baseline gap-4 mb-2">
+            <h3 class="text-lg font-medium text-foreground">
+              {paper.links?.paper ? (
+                <a href={paper.links.paper} target="_blank" rel="noopener noreferrer" class="link-hover">{paper.title}</a>
+              ) : (
+                paper.title
+              )}
+            </h3>
+            <span class="font-mono text-xs text-muted shrink-0">{paper.year}</span>
+          </div>
+          <p class="text-sm text-muted mb-2">
+            <span class="text-foreground">{paper.status}</span> &middot; {paper.venue} &middot; Authors: {paper.authors.join(', ')}
+          </p>
+          <p class="text-sm text-muted mb-3 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+            {paper.abstract}
+          </p>
+          {paper.keywords && paper.keywords.length > 0 && (
+            <div class="flex flex-wrap gap-2 font-mono text-xs mt-2">
+              {paper.keywords.map((kw) => (
+                <span class="px-2 py-1 border border-border text-muted bg-surface/30">{kw}</span>
+              ))}
+            </div>
+          )}
         </div>
-        <p class="text-sm text-muted mb-2">Under review. Author: KM Khalid Saifullah.</p>
-        <p class="font-mono text-xs text-accent/80">Keywords: Autonomous Vehicles, Multi-Agent Systems, V2V Communication, Dynamic Rerouting.</p>
-      </div>
-
-      <div class="border-l-2 border-border pl-6 py-2 hover:border-accent transition-colors">
-        <div class="flex justify-between items-baseline gap-4 mb-2">
-          <h3 class="text-lg font-medium text-foreground"><a href="#" class="link-hover">Sentiment Analysis in Software Engineering: Evaluating Generative Pre-trained Transformers</a></h3>
-          <span class="font-mono text-xs text-muted shrink-0">NCUR 2024</span>
-        </div>
-        <p class="text-sm text-muted mb-2">Published. Benchmarks GPT-4o-mini vs BERT on GitHub / Stack Overflow / Jira.</p>
-      </div>
+      ))}
     </div>
   </section>
 
@@ -101,17 +136,31 @@ import LivingAvatar from '../components/LivingAvatar';
       <div>
         <h2 class="text-sm font-mono text-accent mb-8 uppercase tracking-widest flex items-center before:content-[''] before:block before:w-8 before:h-px before:bg-border before:mr-4">03. Experience</h2>
         <ul class="flex flex-col gap-6">
-          <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-border hover:before:bg-accent before:transition-colors">
-            <h4 class="text-foreground font-medium mb-1">Software Engineering Intern</h4>
+          <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-accent before:transition-colors">
+            <h4 class="text-foreground font-medium mb-1">Lead Software Engineer & Architect</h4>
             <div class="text-sm text-muted font-mono flex justify-between">
-              <span>Company Name</span>
+              <span>AtlasDesk</span>
+              <span>2025 — Present</span>
+            </div>
+          </li>
+          <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-accent before:transition-colors">
+            <h4 class="text-foreground font-medium mb-1">IT Specialist, Solutions Architect</h4>
+            <div class="text-sm text-muted font-mono flex justify-between">
+              <span>The College of Wooster</span>
+              <span>2025 — Present</span>
+            </div>
+          </li>
+          <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-border hover:before:bg-accent before:transition-colors">
+            <h4 class="text-foreground font-medium mb-1">Data Scientist Intern</h4>
+            <div class="text-sm text-muted font-mono flex justify-between">
+              <span>Schneider Electric</span>
               <span>2024</span>
             </div>
           </li>
           <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-border hover:before:bg-accent before:transition-colors">
-            <h4 class="text-foreground font-medium mb-1">Backend Developer Intern</h4>
+            <h4 class="text-foreground font-medium mb-1">Software Engineer Intern</h4>
             <div class="text-sm text-muted font-mono flex justify-between">
-              <span>Company Name</span>
+              <span>Jomee Jomaa Inc.</span>
               <span>2023</span>
             </div>
           </li>
@@ -127,12 +176,12 @@ import LivingAvatar from '../components/LivingAvatar';
           <li class="text-sm">
             <span class="text-foreground font-medium">Google Developer Student Club</span> 
             <span class="text-muted mx-2">—</span> 
-            <span class="text-muted">Co-Lead, The College of Wooster, 2023–2025. Led workshops + hackathons for 100+ students.</span>
+            <span class="text-muted">Co-Lead, The College of Wooster, 2024–2025. Ran workshops and hackathons for the campus developer community.</span>
           </li>
           <li class="text-sm">
             <span class="text-foreground font-medium">Stanford TreeHacks 2024</span> 
             <span class="text-muted mx-2">—</span> 
-            <span class="text-muted">Participant, 36-hour hackathon.</span>
+            <span class="text-muted">Co-built GovAI — an LLM-powered tool for querying government policy in plain language.</span>
           </li>
           <li class="text-sm">
             <span class="text-foreground font-medium">Residential Assistant</span> 

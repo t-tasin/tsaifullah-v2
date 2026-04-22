@@ -7,36 +7,46 @@ import LivingAvatar from '../components/LivingAvatar';
   <div class="mt-20 mb-32 max-w-6xl mx-auto px-4 lg:px-0 animate-fade-in-up">
     <a href="/" class="text-sm font-mono text-muted hover:text-accent transition-colors mb-8 inline-block">&larr; Back to Home</a>
     
-    <div class="flex flex-col lg:flex-row-reverse gap-16 items-center lg:items-start">
-      
-      {/* Living Avatar Sequence */}
-      <div class="w-full lg:w-1/2 shrink-0">
-        <LivingAvatar client:load />
-      </div>
-      
-      <div class="w-full lg:w-1/2 prose prose-invert prose-p:text-muted prose-p:leading-relaxed font-sans max-w-none lg:pt-16">
-        <h1 class="text-3xl font-bold text-foreground mb-6 font-mono tracking-tight">About</h1>
-        
-        <p>
-          I'm K.M. Khalid Saifullah, though I go by Tasin. I'm a product engineer with a background in research, currently focusing on building robust, scalable systems that solve tangible problems.
-        </p>
-        
-        <p>
-          My work sits at the intersection of product intuition and backend architecture. I don't just write code; I look at the entire lifecycle of a problem—from understanding the user's friction points to architecting the dual-database synchronization required to fix them.
-        </p>
-        
-        <p>
-          Recently, my focus has been on leveraging local LLMs and vector search (`pgvector`) to build context-aware automation that respects privacy and scales elegantly. When I'm not building enterprise tools, I'm probably tweaking T.A.R.S, my self-hosted ambient assistant.
-        </p>
-        
-        <div class="mt-8 border-t border-border pt-8 font-mono text-sm">
-          <h3 class="text-foreground mb-4">Currently</h3>
-          <ul class="text-muted flex flex-col gap-2">
-            <li><span class="text-accent">&rarr;</span> Shipping AtlasDesk SaaS</li>
-            <li><span class="text-accent">&rarr;</span> Building ambient automation</li>
-          </ul>
+    <div class="w-full max-w-4xl mx-auto prose prose-invert prose-p:text-muted prose-p:leading-relaxed font-sans">
+      {/* Living Avatar Sequence (Floated Left) */}
+      {/* Outer div uses shape-outside to create an arched text wrap */}
+      <div class="float-left w-[180px] md:w-[240px] aspect-square mr-6 md:mr-10 mb-2 md:mb-6 shrink-0 relative mt-2 rounded-full" style="shape-outside: circle(50%);">
+        {/* Inner div renders the actual SVG much larger, allowing swarm to spill over the text */}
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[450px] aspect-square pointer-events-none">
+          <LivingAvatar client:load />
         </div>
       </div>
+      
+      <h1 class="text-3xl font-bold text-foreground mb-6 font-mono tracking-tight pt-4">About</h1>
+
+<p>
+  I'm K.M. Khalid Saifullah. Most people call me Tasin.
+</p>
+
+<p>
+  I build things I've watched people quietly route around. The longer version: I spent a year as an IT Specialist at The College of Wooster, learned that the licensed platform everyone was supposedly using had been slowly replaced by a patchwork of Slack threads and spreadsheets, and eventually asked if I could replace it properly. They said yes. That became AtlasDesk.
+</p>
+
+<p>
+  Before the platform work, there was research — multi-agent coordination in autonomous vehicle routing, specifically the failure mode where vehicles talking to each other made traffic worse instead of better. I proposed a memory framework that resolved it and presented the work at NCUR. It's the kind of problem that taught me to trust instrumentation more than intuition.
+</p>
+
+<p>
+  My interests sit at the seam between product thinking and systems design. I like problems that have been sitting in plain sight because the people living with them stopped noticing. I like shipping the thing, not writing about shipping the thing. I work fast with AI tools, and I'm stubborn about understanding what the code actually does before it reaches production.
+</p>
+
+<p>
+  Currently I'm finishing T.A.R.S, a self-hosted assistant running on two mini PCs in my apartment. It does useful things. It will, over the next few weeks, do more of them.
+</p>
+
+<div class="mt-8 border-t border-border pt-8 font-mono text-sm">
+  <h3 class="text-foreground mb-4">Currently</h3>
+  <ul class="text-muted flex flex-col gap-2">
+    <li><span class="text-accent">&rarr;</span> Shipping AtlasDesk's multi-tenant SaaS tier</li>
+    <li><span class="text-accent">&rarr;</span> Finishing T.A.R.S</li>
+    <li><span class="text-accent">&rarr;</span> Open to product engineering, solutions engineering, and PM roles</li>
+  </ul>
+</div>      </div>
     </div>
   </div>
 </Layout>

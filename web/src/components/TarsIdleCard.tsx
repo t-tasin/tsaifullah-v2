@@ -3,37 +3,52 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function TarsIdleCard() {
   const [isIdle, setIsIdle] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const resetIdle = () => {
-    setIsIdle(false);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setIsIdle(true);
-    }, 5000); // 5 seconds of hovering without moving
-  };
+  useEffect(() => {
+    const parent = containerRef.current?.closest('a');
+    if (!parent) return;
 
-  const handleMouseLeave = () => {
-    setIsIdle(false);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  };
+    const handleEnter = () => {
+      setIsIdle(false);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setIsIdle(true), 2500); // 2.5 seconds hover triggers it
+    };
+
+    const handleLeave = () => {
+      setIsIdle(false);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+
+    // Attach to the parent <a> tag so hovering anywhere on the T.A.R.S card triggers the terminal
+    parent.addEventListener('mouseenter', handleEnter);
+    parent.addEventListener('mouseleave', handleLeave);
+
+    return () => {
+      parent.removeEventListener('mouseenter', handleEnter);
+      parent.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
 
   return (
     <div 
-      className="text-muted leading-relaxed mb-6 min-h-[5rem]"
-      onMouseEnter={resetIdle}
-      onMouseMove={resetIdle}
-      onMouseLeave={handleMouseLeave}
+      ref={containerRef}
+      className="text-muted mb-4 h-10 w-full"
     >
       <AnimatePresence mode="wait">
         {!isIdle ? (
-          <motion.p
+          <motion.div
             key="normal"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="m-0"
+            className="font-mono text-xs flex items-center p-2 rounded h-full"
           >
-            Personal AI assistant, self-hosted on my apartment server. Continuously running, handling ambient automation across my life — my "second brain." In active development.
-          </motion.p>
+            <span className="mr-2 text-accent">&gt; [SYS]</span> Ambient monitoring active. Waiting for events...
+            <motion.span 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ repeat: Infinity, duration: 0.8 }}
+              className="ml-1 inline-block w-2 h-4 bg-muted align-middle"
+            />
+          </motion.div>
         ) : (
           <motion.div
             key="idle"
