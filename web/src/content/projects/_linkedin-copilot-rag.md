@@ -21,7 +21,7 @@ A few things I learned along the way:
 
 → Fire-and-forget is non-negotiable on the write path. The first version blocked the ticket-create response while the embedding ran. A 1.5s tail latency for nothing the user could see. Never again.
 → Sending less to the LLM than I thought I needed turned out to be the right call. Only titles and source handles leave the box. Descriptions, comment bodies, user PII — none of it goes to Gemini. The model cites handles, and the tech opens the ticket in the existing UI to read details. PII review with the customer's compliance team got a lot easier.
-→ My cache key was naive at first — just `ticketId`. Then a colleague edited a ticket directly in the DB to fix a typo and the copilot kept serving the old draft. Now the key includes a hash of the ticket's title + description + status + latest-comment timestamp, so out-of-band edits invalidate too.
+
 
 The code is part of a larger system I've been documenting on my portfolio. The full RAG architecture is animated there.
 

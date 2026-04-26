@@ -220,9 +220,9 @@ A few discipline rules that don't fit neatly into the per-service sections, but 
 
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">What's running where</h2>
 
-The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 4,000+ users in production, ~140 active techs, ~600 asset categories.
+The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 4,000+ users in production, ~14 active techs, ~7000 asset inventory.
 
-The SaaS tier is in flight. Multi-tenant Postgres on Railway, Next.js frontend on Vercel, password + OTP auth, Microsoft Entra still as an SSO option for orgs that want it.
+The SaaS demo tier is in flight. Multi-tenant Postgres on Railway, Next.js frontend on Vercel, password + OTP auth, Microsoft Entra still as an SSO option for orgs that want it.
 
 <div className="mt-16 mb-8 text-center">
   <p className="text-2xl md:text-3xl font-light text-foreground leading-tight">
