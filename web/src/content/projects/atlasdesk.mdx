@@ -3,7 +3,7 @@ title: "AtlasDesk"
 description: "Production ITSM platform — single-tenant on-prem and multi-tenant SaaS, one codebase."
 role: "Solo Product Engineer"
 status: "Production"
-users: "3000+"
+users: "4000+"
 stack: ["NestJS", "Next.js", "PostgreSQL", "SQL Server", "pgvector"]
 order: 1
 ---
@@ -14,45 +14,67 @@ import TicketLifecycle from '../../components/diagrams/flows/TicketLifecycle';
 import ReservationFlow from '../../components/diagrams/flows/ReservationFlow';
 import EntraSync from '../../components/diagrams/flows/EntraSync';
 
-AtlasDesk is an IT service-management platform — tickets, assets, reservations, notifications, and an AI resolution copilot — running today for an enterprise customer with 3,000+ users on a single-tenant on-premises deployment, and shipping next as a multi-tenant SaaS at `atlasdesk.app`.
-
-I built it solo. The interesting part isn't the feature list. It's that one codebase has to satisfy two very different deployments — an on-prem SQL Server 2022 box behind a corporate firewall with SAML/Entra auth, and a multi-tenant cloud stack on PostgreSQL with password + OTP. Every architectural decision had to survive both worlds.
+<div className="text-xl text-muted font-light leading-relaxed mb-16 space-y-4">
+  <p>AtlasDesk is an IT service-management platform — tickets, assets, reservations, notifications, and an AI resolution copilot — running today for an enterprise customer with 4,000+ users on a <span className="text-accent font-semibold">single-tenant on-premises</span> deployment, and shipping next as a <span className="text-accent font-semibold">multi-tenant SaaS</span> at `atlasdesk.app`.</p>
+  
+  <p>I built it solo. The interesting part isn't the feature list. <strong className="text-foreground">It's that one codebase has to satisfy two very different deployments</strong> — an on-prem <span className="text-accent font-semibold">SQL Server 2022</span> box behind a corporate firewall with <span className="text-accent font-semibold">SAML/Entra</span> auth, and a multi-tenant cloud stack on <span className="text-accent font-semibold">PostgreSQL</span> with password + OTP. Every architectural decision had to survive both worlds.</p>
+</div>
 
 This page walks through the system. The diagrams animate on their own — that's a stylistic choice, not a gimmick. I find static architecture diagrams lie about systems being static when they're actually full of in-flight work.
 
-## The whole picture
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">The whole picture</h2>
 
-<div className="my-8">
+<div className="mt-8 mb-16">
   <MasterArchitecture client:load />
 </div>
 
-Seven services, three lanes. Edge is a Next.js 15 frontend. The services layer is six NestJS microservices, each with its own Postgres schema. The data layer forks: SaaS deployments use Postgres, the on-prem deployment uses SQL Server 2022. Same Docker image runs both — `DB_PROVIDER` is a build arg.
+Seven services, three lanes. Edge is a <span className="text-accent font-semibold">Next.js 15</span> frontend. The services layer is six <span className="text-accent font-semibold">NestJS</span> microservices, each with its own Postgres schema. The data layer forks: SaaS deployments use <span className="text-accent font-semibold">PostgreSQL</span>, the on-prem deployment uses <span className="text-accent font-semibold">SQL Server 2022</span>. Same <span className="text-accent font-semibold">Docker</span> image runs both — `DB_PROVIDER` is a build arg.
 
 A few things in that diagram are worth calling out, because they're load-bearing decisions I learned the hard way.
 
-**Permissions are admin-editable at runtime.** No `@Roles('operator')` decorators. Authorization flows through a no-code matrix that lives in the database. When the customer wants to give a new role permission to merge tickets, an admin clicks a checkbox — no redeploy, no PR. Every permission check fans into `permission.service.hasPermission(...)`. It took longer to build than hardcoded decorators, but the deployment savings are huge.
+<div className="flex flex-col gap-4 my-8">
+  <div className="p-5 bg-surface border border-border rounded-lg border-l-4 border-l-accent">
+    <h4 className="text-lg font-semibold mb-2 text-foreground">Permissions are admin-editable at runtime.</h4>
+    <p className="text-muted leading-relaxed">No `@Roles('operator')` decorators. Authorization flows through a no-code matrix that lives in the database. When the customer wants to give a new role permission to merge tickets, an admin clicks a checkbox — no redeploy, no PR. Every permission check fans into `permission.service.hasPermission(...)`. It took longer to build than hardcoded decorators, but the deployment savings are huge.</p>
+  </div>
 
-**`asset-svc` is the only writer of `Asset.status`.** Reservation-svc never touches the asset table directly — it makes an HTTP call to asset-svc, which serializes status transitions with `SELECT … FOR UPDATE`. Before this rule existed, a reservation flow and a manual-assignment flow could both flip an asset to `reserved` simultaneously. Two reservations for the same laptop, one annoyed user.
+  <div className="p-5 bg-surface border border-border rounded-lg border-l-4 border-l-accent">
+    <h4 className="text-lg font-semibold mb-2 text-foreground">`asset-svc` is the only writer of `Asset.status`.</h4>
+    <p className="text-muted leading-relaxed">Reservation-svc never touches the asset table directly — it makes an HTTP call to asset-svc, which serializes status transitions with <span className="text-accent font-semibold">SELECT … FOR UPDATE</span>. Before this rule existed, a reservation flow and a manual-assignment flow could both flip an asset to `reserved` simultaneously. Two reservations for the same laptop, one annoyed user.</p>
+  </div>
 
-**`notification-svc` is the only thing that touches email.** SMTP, IMAP, Microsoft Graph polling, SES outbound — all of it. Ticket-svc never reads a mailbox; it receives parsed payloads. One transport, one audit trail, one retry queue.
+  <div className="p-5 bg-surface border border-border rounded-lg border-l-4 border-l-accent">
+    <h4 className="text-lg font-semibold mb-2 text-foreground">`notification-svc` is the only thing that touches email.</h4>
+    <p className="text-muted leading-relaxed">SMTP, IMAP, Microsoft Graph polling, SES outbound — all of it. Ticket-svc never reads a mailbox; it receives parsed payloads. One transport, one audit trail, one retry queue.</p>
+  </div>
 
-**The pgvector branch is gated twice.** PostgreSQL-only features (the AI copilot's vector store) need both a schema-level guard (the migration runner refuses to run on SQL Server) and a runtime feature flag (`COPILOT_ENABLED`). Schema-only guarding is a trap — the runtime hooks still fire on the on-prem deploy and try to query a table that doesn't exist, spamming error logs forever and waking up on-call. So: defaults off, on-prem never sets it, SaaS sets it to true.
+  <div className="p-5 bg-surface border border-border rounded-lg border-l-4 border-l-accent">
+    <h4 className="text-lg font-semibold mb-2 text-foreground">The pgvector branch is gated twice.</h4>
+    <p className="text-muted leading-relaxed"><span className="text-accent font-semibold">PostgreSQL</span>-only features (the AI copilot's vector store) need both a schema-level guard (the migration runner refuses to run on SQL Server) and a runtime feature flag (`COPILOT_ENABLED`). Schema-only guarding is a trap — the runtime hooks still fire on the on-prem deploy and try to query a table that doesn't exist, spamming error logs forever and waking up on-call. So: defaults off, on-prem never sets it, SaaS sets it to true.</p>
+  </div>
+</div>
 
-## Identity service · nightly Entra sync
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Identity service · nightly Entra sync</h2>
 
-<div className="my-8">
+<div className="mt-8 mb-16">
   <EntraSync client:load />
 </div>
 
-The on-prem customer authenticates through Microsoft Entra ID via SAML. JIT provisioning handles first-time logins, but I also need a nightly reconciliation pass — for departures, role changes, group membership updates that happen out-of-band.
+The on-prem customer authenticates through <span className="text-accent font-semibold">Microsoft Entra ID</span> via SAML. <span className="text-accent font-semibold">JIT provisioning</span> handles first-time logins, but I also need a nightly reconciliation pass — for departures, role changes, group membership updates that happen out-of-band.
 
-A cron fires at 02:00. `identity-svc` calls Microsoft Graph with a delta query — the token from the previous run, so we only get changes. The service diffs the result against the local `User` table and fans out into three buckets: rows to add, rows to update, rows to deactivate. Every change writes to an audit log.
+A cron fires at 02:00. `identity-svc` calls <span className="text-accent font-semibold">Microsoft Graph</span> with a <span className="text-accent font-semibold">delta query</span> — the token from the previous run, so we only get changes. The service diffs the result against the local `User` table and fans out into three buckets: rows to add, rows to update, rows to deactivate. Every change writes to an audit log.
 
-The tricky bit is shadow users. If an inbound email arrives from someone who isn't in Entra (a vendor, a parent, a contractor), the inbound pipeline creates a shadow `User` with `syncSource = EXTERNAL_EMAIL_SHADOW`. The Entra sync **must not** overwrite shadow users — they have no Entra identity to reconcile against. So the upsert is conditional on `syncSource = ENTRA`. Admins can later link a shadow user to an Entra user manually via `UserAlternateEmail`, retiring the shadow.
+<div className="my-8 p-5 rounded-lg border-l-4 border-amber-500 bg-amber-500/10 text-amber-500/90">
+  <h4 className="flex items-center gap-2 font-semibold text-amber-500 mb-2">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+    Edge Case: Shadow Users
+  </h4>
+  <p className="text-sm leading-relaxed">If an inbound email arrives from someone who isn't in Entra (a vendor, a parent, a contractor), the inbound pipeline creates a shadow `User` with `syncSource = EXTERNAL_EMAIL_SHADOW`. The Entra sync <strong className="text-amber-500">must not</strong> overwrite shadow users — they have no Entra identity to reconcile against. So the upsert is conditional on `syncSource = ENTRA`. Admins can later link a shadow user to an Entra user manually via `UserAlternateEmail`, retiring the shadow.</p>
+</div>
 
-## Ticket service · the lifecycle
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Ticket service · the lifecycle</h2>
 
-<div className="my-8">
+<div className="mt-8 mb-16">
   <TicketLifecycle client:load />
 </div>
 
@@ -62,9 +84,9 @@ The branch you can see going up to PGVECTOR is the AI copilot's embed pipeline. 
 
 Escalation is role-based, not user-based. When a ticket needs to escalate from a tier-1 tech to a system admin, it doesn't pick a specific person — it targets a role. Anyone in that role can pick it up. De-escalation, on the other hand, returns to the *specific* originating tech, not the general pool, so the original owner sees their work return. This required threading `assignedToUserId` and `escalationType` through every transition, and is one of those product details that didn't fit neatly into either "stateful" or "stateless" — it's both at different times.
 
-## Asset service · the single-writer rule
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Asset service · the single-writer rule</h2>
 
-<div className="my-8">
+<div className="mt-8 mb-16">
   <ReservationFlow client:load />
 </div>
 
@@ -74,15 +96,20 @@ The flow goes through reservation-svc — request, review, approve. The interest
 
 This pattern has a cost: every reservation flow is now an extra network hop and a serialization point. But it removes an entire class of race conditions, and we don't have to convince every future contributor not to write to `Asset.status` from a new place. The schema can't be the source of truth for "who's allowed to write here" — only the service boundary can.
 
-## Notification service · single email transport
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Notification service · single email transport</h2>
 
-There's no diagram here because notification-svc isn't a flow, it's a guarantee: nothing else in the codebase opens a mail connection. SMTP, IMAP, Graph polling, SES — all of it lives behind one service. Ticket-svc doesn't poll email. Asset-svc doesn't send confirmations directly. They publish events; notification-svc is the listener.
+<div className="my-12 py-8 border-y border-border text-center">
+  <h3 className="text-2xl font-light text-foreground mb-4">"One transport, one audit trail, one retry queue."</h3>
+  <p className="text-muted max-w-xl mx-auto leading-relaxed">Because `notification-svc` isn't a flow, it's a guarantee: nothing else in the codebase opens a mail connection. Ticket-svc doesn't poll email. Asset-svc doesn't send confirmations directly. They publish events; notification-svc is the listener.</p>
+</div>
+
+
 
 This single rule has saved more debugging time than any other architectural decision. When an email doesn't go out, there's exactly one place to look. When the customer's Graph credentials rotate, there's exactly one place to update them. When a retry queue is needed for outbound mail, it has one owner.
 
-## Resolution Copilot · the RAG pipeline
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Resolution Copilot · the RAG pipeline</h2>
 
-<div className="my-8">
+<div className="mt-8 mb-16">
   <CopilotRag client:load />
 </div>
 
@@ -90,37 +117,117 @@ This is the part I most enjoyed building, and it's also the part I'd most expect
 
 When a tech opens a ticket, the system has already drafted a reply for them — citing past tickets and KB articles that solved similar issues. The retrieval is over the live ticket corpus, not a pre-built index, and the corpus stays current without a nightly batch job.
 
-**Embedding model:** [`Xenova/bge-small-en-v1.5`](https://huggingface.co/BAAI/bge-small-en-v1.5) running locally via `transformers.js` (ONNX, CPU). 384 dimensions. The first call is ~1–3s while the model loads; subsequent calls are sub-50ms. No external API for embeddings — important both for cost and for avoiding sending ticket content to a third party.
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+  <div className="p-5 bg-surface border border-border rounded-xl flex flex-col gap-3">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <h4 className="text-foreground font-semibold">Embedding Model</h4>
+      <a href="https://huggingface.co/BAAI/bge-small-en-v1.5" target="_blank" className="inline-flex items-center gap-1 px-2 py-1 w-fit text-xs bg-background border border-border rounded hover:border-accent transition-colors text-muted hover:text-accent">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        Xenova/bge-small-en-v1.5
+      </a>
+    </div>
+    <p className="text-sm text-muted leading-relaxed">Running locally via <span className="text-accent font-semibold">transformers.js</span> (<span className="text-accent font-semibold">ONNX</span>, CPU). 384 dimensions. The first call is ~1–3s while the model loads; subsequent calls are sub-50ms. No external API for embeddings — important both for cost and for avoiding sending ticket content to a third party.</p>
+  </div>
 
-**Vector store:** pgvector inside the ticket-svc Postgres schema. Two tables, `TicketEmbedding` and `KbArticleEmbedding`, both with `ivfflat` indexes. Cosine distance via `<=>`.
+  <div className="p-5 bg-surface border border-border rounded-xl flex flex-col gap-3">
+    <h4 className="text-foreground font-semibold">Vector Store</h4>
+    <p className="text-sm text-muted leading-relaxed"><span className="text-accent font-semibold">pgvector</span> inside the ticket-svc Postgres schema. Two tables, `TicketEmbedding` and `KbArticleEmbedding`, both with <span className="text-accent font-semibold">ivfflat</span> indexes. <span className="text-accent font-semibold">Cosine distance</span> via `<=>`.</p>
+  </div>
 
-**Retrieval:** top-5 tickets and top-3 KB articles fused via [Reciprocal Rank Fusion](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf) (`k=60`), trimmed to top 3.
+  <div className="p-5 bg-surface border border-border rounded-xl flex flex-col gap-3">
+    <h4 className="text-foreground font-semibold">Retrieval</h4>
+    <p className="text-sm text-muted leading-relaxed">Top-5 tickets and top-3 KB articles fused via <a href="https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf" className="text-accent hover:underline" target="_blank">Reciprocal Rank Fusion</a> (`k=60`), trimmed to top 3.</p>
+  </div>
 
-**Synthesis:** Gemini 2.5 Flash. The system prompt tells it to act as a senior helpdesk technician at the customer's institution, draft a concise reply using only the provided context, and cite each source by handle (`[t-2341]`, `[kb-outlook-mac-auth]`). Importantly: **only ticket titles and source handles go to Gemini** — never descriptions, never comment bodies, never PII. The model emits cited handles; the tech click-throughs to read details in-app.
+  <div className="p-5 bg-surface border border-border rounded-xl flex flex-col gap-3">
+    <h4 className="text-foreground font-semibold">Synthesis</h4>
+    <p className="text-sm text-muted leading-relaxed"><span className="text-accent font-semibold">Gemini 2.5 Flash</span>. The system prompt tells it to act as a senior tech, draft a concise reply using only context, and cite sources. Importantly: <strong className="text-foreground font-semibold">only titles and handles go to Gemini</strong> — never descriptions, bodies, or PII.</p>
+  </div>
 
-**Caching:** in-memory, keyed by `ticketId + mutationKey`, where `mutationKey` is a hash of `createdAt | latestCommentAt | status | md5(title + description)`. This means out-of-band edits to a ticket bust the cache too, even when our own re-embed didn't fire. TTL is 1 hour, max 500 entries.
+  <div className="p-5 bg-surface border border-border rounded-xl flex flex-col gap-3 md:col-span-2">
+    <h4 className="text-foreground font-semibold">Caching</h4>
+    <p className="text-sm text-muted leading-relaxed">In-memory, keyed by `ticketId + mutationKey`, where `mutationKey` is a hash of `createdAt | latestCommentAt | status | md5(title + description)`. This means out-of-band edits to a ticket bust the cache too, even when our own re-embed didn't fire. TTL is 1 hour, max 500 entries.</p>
+  </div>
+</div>
 
-The part I'm proudest of is the self-update mechanism. Three triggers re-embed a ticket the moment its content meaningfully changes:
+<div className="my-10">
+  <p className="text-foreground leading-relaxed mb-6">The part I'm proudest of is the self-update mechanism. Three triggers re-embed a ticket the moment its content meaningfully changes:</p>
+  
+  <div className="flex flex-col gap-4 mb-8">
+    <div className="p-5 bg-surface border border-border rounded-lg flex gap-4 items-start">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-background border border-accent flex items-center justify-center text-accent font-mono text-sm">1</div>
+      <div>
+        <h4 className="font-semibold text-foreground mb-1">Ticket creation</h4>
+        <p className="text-sm text-muted leading-relaxed">Embedded immediately after the row commits.</p>
+      </div>
+    </div>
+    
+    <div className="p-5 bg-surface border border-border rounded-lg flex gap-4 items-start">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-background border border-accent flex items-center justify-center text-accent font-mono text-sm">2</div>
+      <div>
+        <h4 className="font-semibold text-foreground mb-1">Edited title or description</h4>
+        <p className="text-sm text-muted leading-relaxed">Re-embedded only if those specific fields changed. Status changes, assignment changes, and other edits don't move retrieval quality, so we don't pay for them.</p>
+      </div>
+    </div>
+    
+    <div className="p-5 bg-surface border border-border rounded-lg flex gap-4 items-start">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-background border border-accent flex items-center justify-center text-accent font-mono text-sm">3</div>
+      <div>
+        <h4 className="font-semibold text-foreground mb-1">Public tech comment</h4>
+        <p className="text-sm text-muted leading-relaxed">Re-embedded so resolutions land in the corpus. Internal notes are filtered out (they're discussion, not knowledge), and so are the requester's own replies (we want techs' fixes, not users' confusion).</p>
+      </div>
+    </div>
+  </div>
+  
+  <div className="text-muted leading-relaxed p-5 bg-surface/50 border border-border rounded-lg border-l-4 border-l-accent">
+    Re-embeds are fire-and-forget. They never block the write path. They no-op completely on the on-prem (SQL Server) deploy because the feature flag is unset and the service constructor short-circuits. Whenever the embedding model changes, a backfill script walks every ticket whose stored `modelVersion` lags the current one and re-embeds in batches.
+  </div>
+</div>
 
-1. **Ticket creation** — embedded immediately after the row commits.
-2. **Edited title or description** — re-embedded only if those specific fields changed. Status changes, assignment changes, and other edits don't move retrieval quality, so we don't pay for them.
-3. **Public tech comment** — re-embedded so resolutions land in the corpus. Internal notes are filtered out (they're discussion, not knowledge), and so are the requester's own replies (we want techs' fixes, not users' confusion).
-
-Re-embeds are fire-and-forget. They never block the write path. They no-op completely on the on-prem (SQL Server) deploy because the feature flag is unset and the service constructor short-circuits. Whenever the embedding model changes, a backfill script walks every ticket whose stored `modelVersion` lags the current one and re-embeds in batches.
-
-## Engineering rules I committed to
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Engineering rules I committed to</h2>
 
 A few discipline rules that don't fit neatly into the per-service sections, but show up everywhere:
 
-- **No Prisma migrations against databases with data.** Every schema change is a hand-rolled SQL file run through a TypeScript migration runner that asserts row counts before and after. I lost a database to `prisma migrate dev` exactly once. That was enough.
-- **No SQL Server `Json` columns, no Prisma enum types.** SQL Server doesn't support either cleanly. JSON lives as `NVARCHAR(MAX)` with manual `JSON.parse` / `stringify`. Enums are strings with code-side validation. The Postgres deploy gets nothing extra; the on-prem deploy gets nothing missing.
-- **Tests derive from requirements, not from code.** Each service has a `requirements/<svc>.md` file in Given/When/Then format. Integration tests cite a section. If the code disagrees with the requirement, the code is wrong.
-- **One repo, two branches.** `main` for SaaS, `wooster-main` for on-prem. Features merge to `main` first, then cherry-pick or merge into the on-prem branch. The on-prem branch only contains environment-specific config deltas — never product divergence.
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+  <div className="space-y-2">
+    <h4 className="font-semibold text-foreground flex items-center gap-2">
+      <span className="text-accent font-mono">01.</span> No Prisma migrations with data
+    </h4>
+    <p className="text-sm text-muted leading-relaxed">Every schema change is a hand-rolled SQL file run through a TypeScript migration runner that asserts row counts before and after. I lost a database to `prisma migrate dev` exactly once. That was enough.</p>
+  </div>
 
-## What's running where
+  <div className="space-y-2">
+    <h4 className="font-semibold text-foreground flex items-center gap-2">
+      <span className="text-accent font-mono">02.</span> No SQL Server JSON / Prisma enums
+    </h4>
+    <p className="text-sm text-muted leading-relaxed"><span className="text-accent font-semibold">SQL Server</span> doesn't support either cleanly. JSON is `NVARCHAR(MAX)` with manual parse/stringify. Enums are strings. The <span className="text-accent font-semibold">PostgreSQL</span> deploy gets nothing extra; on-prem gets nothing missing.</p>
+  </div>
 
-The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 3,000+ users in production, ~140 active techs, ~600 asset categories.
+  <div className="space-y-2">
+    <h4 className="font-semibold text-foreground flex items-center gap-2">
+      <span className="text-accent font-mono">03.</span> Tests derive from requirements
+    </h4>
+    <p className="text-sm text-muted leading-relaxed">Each service has a `requirements/<svc>.md` file in Given/When/Then format. Integration tests cite a section. If the code disagrees with the requirement, the code is wrong.</p>
+  </div>
+
+  <div className="space-y-2">
+    <h4 className="font-semibold text-foreground flex items-center gap-2">
+      <span className="text-accent font-mono">04.</span> One repo, two branches
+    </h4>
+    <p className="text-sm text-muted leading-relaxed">`main` for SaaS, `wooster-main` for on-prem. Features merge to `main` first, then cherry-pick to the on-prem branch. The on-prem branch only contains environment-specific config deltas.</p>
+  </div>
+</div>
+
+<h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">What's running where</h2>
+
+The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 4,000+ users in production, ~140 active techs, ~600 asset categories.
 
 The SaaS tier is in flight. Multi-tenant Postgres on Railway, Next.js frontend on Vercel, password + OTP auth, Microsoft Entra still as an SSO option for orgs that want it.
 
-The codebase is the same. The deployment is different. That was the whole point.
+<div className="mt-16 mb-8 text-center">
+  <p className="text-2xl md:text-3xl font-light text-foreground leading-tight">
+    The codebase is the same.<br/>
+    The deployment is different.<br/>
+    <span className="font-semibold text-accent mt-4 block">That was the whole point.</span>
+  </p>
+</div>
