@@ -1,0 +1,43 @@
+---
+import CopilotRagDiagram from '../../components/diagrams/copilot/CopilotRag';
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Export · Copilot RAG</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #0a0a0b;
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
+      #stage {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4vh 4vw;
+        box-sizing: border-box;
+      }
+      .diagram-shell {
+        width: 100%;
+        max-width: 1600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div class="diagram-shell">
+        <CopilotRagDiagram client:load />
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MasterArchitecture from '../../components/diagrams/system/MasterArchitecture';
+import CopilotRag from '../../components/diagrams/copilot/CopilotRag';
+import TicketLifecycle from '../../components/diagrams/flows/TicketLifecycle';
+import ReservationFlow from '../../components/diagrams/flows/ReservationFlow';
+import EntraSync from '../../components/diagrams/flows/EntraSync';
+---
+
+<Layout title="Diagram Preview · AtlasDesk">
+  <main class="w-full max-w-6xl mx-auto px-6 pb-24">
+    <h1 class="font-mono text-sm tracking-widest uppercase text-muted mb-2">
+      sys.preview / diagrams
+    </h1>
+    <p class="text-foreground text-lg mb-8">
+      AtlasDesk architecture diagrams — work in progress.
+    </p>
+
+    <section class="mb-16">
+      <h2 class="font-mono text-xs tracking-widest uppercase text-accent mb-4">
+        01 / master architecture
+      </h2>
+      <MasterArchitecture client:load />
+      <p class="font-mono text-xs text-muted/60 mt-3">
+        7 services · two-deploy fork · single-writer + matrix-authz callouts
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="font-mono text-xs tracking-widest uppercase text-accent mb-4">
+        02 / copilot rag
+      </h2>
+      <CopilotRag client:load />
+      <p class="font-mono text-xs text-muted/60 mt-3">
+        write triggers feed pgvector · read path fans through RRF + Gemini · self-updating
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="font-mono text-xs tracking-widest uppercase text-accent mb-4">
+        03 / ticket lifecycle
+      </h2>
+      <TicketLifecycle client:load />
+      <p class="font-mono text-xs text-muted/60 mt-3">
+        end-to-end · stage row + owning-service row · embed branches off CREATE
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="font-mono text-xs tracking-widest uppercase text-accent mb-4">
+        04 / reservation flow
+      </h2>
+      <ReservationFlow client:load />
+      <p class="font-mono text-xs text-muted/60 mt-3">
+        client → reservation-svc → asset-svc HTTP boundary · single-writer rule
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="font-mono text-xs tracking-widest uppercase text-accent mb-4">
+        05 / entra nightly sync
+      </h2>
+      <EntraSync client:load />
+      <p class="font-mono text-xs text-muted/60 mt-3">
+        cron 02:00 · delta query · diff fan-out · audit fan-in
+      </p>
+    </section>
+  </main>
+</Layout>
