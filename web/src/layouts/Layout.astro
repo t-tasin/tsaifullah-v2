@@ -20,6 +20,16 @@ const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <ViewTransitions />
+
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-C5DPHPMGN8"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-C5DPHPMGN8');
+    </script>
   </head>
   <body class="min-h-screen bg-background schematic-bg flex flex-col relative overflow-x-hidden">
     
