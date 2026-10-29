@@ -11,34 +11,74 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+const { title, description, role, status, users, stack, lens } = entry.data;
 ---
 
-<Layout title={`${entry.data.title} | Tasin`}>
-  <article class="mt-20 mb-32 animate-fade-in-up">
-    <header class="mb-12">
-      <div class="flex flex-wrap items-end gap-6 justify-between border-b border-border pb-6 mb-6">
-        <div>
-          <a href="/" class="text-sm font-mono text-muted hover:text-accent transition-colors mb-4 inline-block">&larr; Back</a>
-          <h1 class="text-4xl sm:text-5xl font-bold text-foreground tracking-tight">{entry.data.title}</h1>
-        </div>
-        <div class="flex flex-col items-end gap-2 text-right">
-          <span class="font-mono text-sm text-accent">{entry.data.status}</span>
-          <span class="font-mono text-xs text-muted">Role: {entry.data.role}</span>
-          {entry.data.users && <span class="font-mono text-xs text-muted">Scale: {entry.data.users}</span>}
-        </div>
+<Layout title={`${title} · Tasin`} description={description}>
+  <article class="pt-12 sm:pt-16 mb-24">
+    <header class="mb-14">
+      <a href="/#work" class="pressable inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-10">
+        <span aria-hidden="true">←</span> All work
+      </a>
+
+      <div class="flex items-center gap-2 mb-5">
+        {lens.map((l) => <span class="chip capitalize">{l}</span>)}
       </div>
-      <p class="text-xl text-muted leading-relaxed font-sans max-w-3xl">
-        {entry.data.description}
-      </p>
-      <div class="mt-6 flex flex-wrap gap-2 font-mono text-xs">
-        {entry.data.stack.map((tech: string) => (
-          <span class="px-2 py-1 border border-border text-muted bg-surface/50">{tech}</span>
-        ))}
+      <h1 class="t-title text-foreground" transition:name={`project-title-${entry.slug}`}>{title}</h1>
+      <p class="t-lead text-muted mt-5 max-w-[48ch] text-balance animate-fade-in" style="animation-delay: 120ms;">{description}</p>
+
+      <dl class="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-y-5 gap-x-6 border-y border-border py-5 animate-fade-in" style="animation-delay: 180ms;">
+        <div>
+          <dt class="t-label mb-2">Role</dt>
+          <dd class="text-foreground">{role}</dd>
+        </div>
+        <div>
+          <dt class="t-label mb-2">Status</dt>
+          <dd class="text-foreground flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>{status}
+          </dd>
+        </div>
+        {users && (
+          <div>
+            <dt class="t-label mb-2">Scale</dt>
+            <dd class="text-foreground tabular-nums">{users} users</dd>
+          </div>
+        )}
+      </dl>
+
+      <div class="mt-5 flex flex-wrap gap-2 animate-fade-in" style="animation-delay: 220ms;">
+        {stack.map((tech: string) => <span class="chip">{tech}</span>)}
       </div>
     </header>
 
-    <div class="prose prose-invert prose-headings:font-sans prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-li:text-muted max-w-none">
+    <div class="article animate-fade-in" style="animation-delay: 240ms;">
       <Content />
+    </div>
+
+    <!-- Reaching this point counts as reading the case study to the end. -->
+    <div data-case-study-end={entry.slug} aria-hidden="true"></div>
+
+    <div class="mt-20 pt-8 border-t border-border">
+      <a href="/#work" class="pressable inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors">
+        <span aria-hidden="true">←</span> All work
+      </a>
     </div>
   </article>
 </Layout>
+
+<script>
+  import { track } from '../../lib/analytics';
+
+  // Runs on every View Transition navigation, once per case study per visit.
+  document.addEventListener('astro:page-load', () => {
+    const marker = document.querySelector<HTMLElement>('[data-case-study-end]');
+    if (!marker) return;
+    const slug = marker.dataset.caseStudyEnd!;
+    const io = new IntersectionObserver((entries) => {
+      if (!entries[0]?.isIntersecting) return;
+      io.disconnect();
+      track('case_study_complete', { case_study: slug });
+    });
+    io.observe(marker);
+  });
+</script>

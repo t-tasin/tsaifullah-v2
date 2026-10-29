@@ -1,5 +1,8 @@
-import React from "react";
+import React, { createContext, useContext, useId } from "react";
 import { THEME } from "./types";
+
+/** Marker ids are unique per SvgLayer, so several diagrams can share a page. */
+const MarkerIds = createContext({ normal: "arrowhead", accent: "arrowhead-accent" });
 
 type Props = {
   id: string;
@@ -33,6 +36,7 @@ export function Arrow({
   emphasis = "normal",
   arrowhead = true,
 }: Props) {
+  const markers = useContext(MarkerIds);
   const dx = to.xPct - from.xPct;
   const dy = to.yPct - from.yPct;
 
@@ -70,7 +74,7 @@ export function Arrow({
       strokeWidth={3.5}
       strokeOpacity={emphasis === "dim" ? 0.5 : 0.85}
       strokeDasharray={dash ? dash.split(' ').map(n => Number(n) * 10).join(' ') : undefined}
-      markerEnd={arrowhead ? "url(#arrowhead)" : undefined}
+      markerEnd={arrowhead ? `url(#${emphasis === "highlight" ? markers.accent : markers.normal})` : undefined}
       strokeLinecap="round"
     />
   );
@@ -81,14 +85,17 @@ export function Arrow({
  * diagram. Use once per DiagramFrame.
  */
 export function SvgLayer({ children }: { children: React.ReactNode }) {
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const ids = { normal: `arrowhead-${uid}`, accent: `arrowhead-accent-${uid}` };
   return (
+    <MarkerIds.Provider value={ids}>
     <svg
       viewBox="0 0 1600 900"
       className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
     >
       <defs>
         <marker
-          id="arrowhead"
+          id={ids.normal}
           viewBox="0 0 10 10"
           refX="8"
           refY="5"
@@ -99,7 +106,7 @@ export function SvgLayer({ children }: { children: React.ReactNode }) {
           <path d="M 0 0 L 10 5 L 0 10 z" fill={THEME.muted} opacity="0.85" />
         </marker>
         <marker
-          id="arrowhead-accent"
+          id={ids.accent}
           viewBox="0 0 10 10"
           refX="8"
           refY="5"
@@ -112,5 +119,6 @@ export function SvgLayer({ children }: { children: React.ReactNode }) {
       </defs>
       {children}
     </svg>
+    </MarkerIds.Provider>
   );
 }

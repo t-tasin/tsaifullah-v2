@@ -3,49 +3,44 @@ import Layout from '../layouts/Layout.astro';
 import LivingAvatar from '../components/LivingAvatar';
 ---
 
-<Layout title="About | Tasin">
-  <div class="mt-20 mb-32 max-w-6xl mx-auto px-4 lg:px-0 animate-fade-in-up">
-    <a href="/" class="text-sm font-mono text-muted hover:text-accent transition-colors mb-8 inline-block">&larr; Back to Home</a>
-    
-    <div class="w-full max-w-4xl mx-auto prose prose-invert prose-p:text-muted prose-p:leading-relaxed font-sans">
-      {/* Living Avatar Sequence (Floated Left) */}
-      {/* Outer div uses shape-outside to create an arched text wrap */}
-      <div class="float-left w-[180px] md:w-[240px] aspect-square mr-6 md:mr-10 mb-2 md:mb-6 shrink-0 relative mt-2 rounded-full" style="shape-outside: circle(50%);">
-        {/* Inner div renders the actual SVG much larger, allowing swarm to spill over the text */}
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[450px] aspect-square pointer-events-none">
-          <LivingAvatar client:load />
-        </div>
+<Layout title="About · Tasin">
+  <div class="pt-12 sm:pt-16 mb-24 grid md:grid-cols-[220px_1fr] gap-10 md:gap-14 items-start">
+    <div class="w-40 md:w-full md:sticky md:top-24" aria-hidden="true">
+      <LivingAvatar client:visible animate={false} />
+    </div>
+
+    <div class="min-w-0 animate-fade-in-up">
+      <p class="t-label mb-4">About</p>
+      <h1 class="t-title text-foreground mb-10">Most people call me Tasin.</h1>
+
+      <div class="article">
+        <p>
+          I'm KM Khalid Saifullah. I build things I've watched people quietly route around.
+        </p>
+
+        <p>
+          The longer version: I was answering tickets on the help desk at The College of Wooster, and learned that the licensed platform everyone was supposedly using had been slowly replaced by a patchwork of Slack threads and spreadsheets. So I interviewed 38 of the people living with it, built a replacement over a weekend, and pitched it to the four divisional directors. They said yes. That became AtlasDesk.
+        </p>
+
+        <p>
+          Before the platform work, there was research — multi-agent coordination in autonomous vehicle routing, specifically the failure mode where vehicles talking to each other made traffic worse instead of better. I proposed a memory framework that resolved it and presented the work at NCUR. It's the kind of problem that taught me to trust instrumentation more than intuition.
+        </p>
+
+        <p>
+          My interests sit at the seam between product thinking and systems design. I like problems that have been sitting in plain sight because the people living with them stopped noticing. I like shipping the thing, not writing about shipping the thing. I work fast with AI tools, and I'm stubborn about understanding what the code actually does before it reaches production.
+        </p>
+
+        <p>
+          These days I spend less time adding features to AtlasDesk and more time running it. There are four engineers on it now, and most of what I do is review, decide, and make the boring parts mechanical — the lint rule that rejects a query pattern before it breaks the other database, the migration runner that counts rows before and after, the test that fails when a permission check goes missing. Shipping was the easy half.
+        </p>
+
+        <h2>Currently</h2>
+        <ul>
+          <li>Leading the four college engineers who maintain AtlasDesk.</li>
+          <li>Building an on-call agent for the platform, and the evaluation suite that decides whether it is allowed to ship.</li>
+          <li>Writing up how my projects were built, from the product side and the engineering side.</li>
+        </ul>
       </div>
-      
-      <h1 class="text-3xl font-bold text-foreground mb-6 font-mono tracking-tight pt-4">About</h1>
-
-<p>
-  I'm K.M. Khalid Saifullah. Most people call me Tasin.
-</p>
-
-<p>
-  I build things I've watched people quietly route around. The longer version: I spent a year as an IT Specialist at The College of Wooster, learned that the licensed platform everyone was supposedly using had been slowly replaced by a patchwork of Slack threads and spreadsheets, and eventually asked if I could replace it properly. They said yes. That became AtlasDesk.
-</p>
-
-<p>
-  Before the platform work, there was research — multi-agent coordination in autonomous vehicle routing, specifically the failure mode where vehicles talking to each other made traffic worse instead of better. I proposed a memory framework that resolved it and presented the work at NCUR. It's the kind of problem that taught me to trust instrumentation more than intuition.
-</p>
-
-<p>
-  My interests sit at the seam between product thinking and systems design. I like problems that have been sitting in plain sight because the people living with them stopped noticing. I like shipping the thing, not writing about shipping the thing. I work fast with AI tools, and I'm stubborn about understanding what the code actually does before it reaches production.
-</p>
-
-<p>
-  Currently I'm finishing T.A.R.S, a self-hosted assistant running on two mini PCs in my apartment. It does useful things. It will, over the next few weeks, do more of them.
-</p>
-
-<div class="mt-8 border-t border-border pt-8 font-mono text-sm">
-  <h3 class="text-foreground mb-4">Currently</h3>
-  <ul class="text-muted flex flex-col gap-2">
-    <li><span class="text-accent">&rarr;</span> Shipping more features for AtlasDesk.</li>
-    <li><span class="text-accent">&rarr;</span> Finishing T.A.R.S.</li>
-  </ul>
-</div>      </div>
     </div>
   </div>
 </Layout>

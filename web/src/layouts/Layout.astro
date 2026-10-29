@@ -1,5 +1,8 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
+import Logo from '../components/Logo.astro';
+import Nav from '../components/Nav';
+import CopyEmail from '../components/CopyEmail';
 import '../styles/global.css';
 
 interface Props {
@@ -7,18 +10,33 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
+const {
+  title,
+  description = 'Tasin (KM Khalid Saifullah) builds products end to end: from user interviews to systems running in production.',
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0a0b" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
     <title>{title}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
     <ViewTransitions />
 
     <!-- Google tag (gtag.js) -->
@@ -28,40 +46,77 @@ const { title, description = "Tasin's Personal Portfolio" } = Astro.props;
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-C5DPHPMGN8');
+      // Page views are sent by hand: View Transitions swap pages without a
+      // reload, so the automatic page_view would only count the landing page.
+      // (GA4 "page changes based on browser history events" must be OFF.)
+      gtag('config', 'G-C5DPHPMGN8', { send_page_view: false });
+
+      if (!window.__tsPageViews) {
+        window.__tsPageViews = true;
+        document.addEventListener('astro:page-load', function () {
+          gtag('event', 'page_view', {
+            page_location: window.location.href,
+            page_path: window.location.pathname + window.location.search,
+            page_title: document.title,
+          });
+        });
+      }
     </script>
   </head>
   <body class="min-h-screen bg-background schematic-bg flex flex-col relative overflow-x-hidden">
-    
-    <!-- Subtle fade out at the top/bottom for the grid -->
+    <!-- Fade the grid out at the top and bottom -->
     <div class="fixed inset-0 pointer-events-none bg-gradient-to-b from-background via-transparent to-background z-[-1]"></div>
-    
-    <header class="w-full max-w-4xl mx-auto px-6 py-12 flex justify-between items-center z-10">
-      <a href="/" class="text-xl font-bold font-mono tracking-tight group flex items-center gap-2">
-        <span class="text-accent group-hover:animate-pulse">ts</span>
-        <span class="text-muted group-hover:text-foreground transition-colors">/</span>
-      </a>
-      <nav class="flex gap-6 text-sm font-mono text-muted">
-        <a href="/" class="hover:text-accent transition-colors">Home</a>
-        <a href="/projects/atlasdesk" class="hover:text-accent transition-colors">AtlasDesk</a>
-        <a href="/resume" class="hover:text-accent transition-colors">Resume</a>
-        <a href="/about" class="hover:text-accent transition-colors">About</a>
-      </nav>
+
+    <header class="site-header sticky top-0 z-30" transition:persist="site-header">
+      <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center">
+        <a href="/" class="pressable flex items-center gap-2.5 text-foreground" aria-label="Tasin, home">
+          <Logo />
+          <span class="hidden sm:inline font-semibold tracking-[-0.01em]">Tasin</span>
+        </a>
+        <Nav client:load />
+      </div>
     </header>
 
-    <main class="flex-grow w-full max-w-4xl mx-auto px-6 z-10">
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 z-10">
       <slot />
     </main>
 
-    <footer class="w-full max-w-4xl mx-auto px-6 py-12 mt-24 border-t border-border/50 text-sm font-mono text-muted z-10">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <p>&copy; {new Date().getFullYear()} Tasin (K.M. Khalid Saifullah)</p>
-        <div class="flex gap-4">
-          <a href="mailto:tsaifullah25@gmail.com" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">Email</a>
-          <a href="https://www.linkedin.com/in/k-tasin/" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">LinkedIn</a>
-          <a href="https://github.com/t-tasin" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">GitHub</a>
+    <footer class="w-full max-w-4xl mx-auto px-4 sm:px-6 py-12 mt-24 border-t border-border text-sm z-10">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+        <p class="text-faint">&copy; {new Date().getFullYear()} KM Khalid Saifullah (Tasin)</p>
+        <div class="flex items-center gap-5">
+          <CopyEmail client:visible variant="link" />
+          <a href="https://www.linkedin.com/in/k-tasin/" target="_blank" rel="noopener noreferrer" class="pressable text-muted hover:text-foreground transition-colors">LinkedIn</a>
+          <a href="https://github.com/t-tasin" target="_blank" rel="noopener noreferrer" class="pressable text-muted hover:text-foreground transition-colors">GitHub</a>
         </div>
       </div>
     </footer>
   </body>
 </html>
+
+<style>
+  /* Translucent chrome: content scrolls underneath, and the material fades out
+     at its lower edge instead of ending on a hard divider. */
+  .site-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 -12px 0;
+    z-index: -1;
+    background: rgb(10 10 11 / 0.72);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent);
+    mask-image: linear-gradient(to bottom, black 70%, transparent);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .site-header::before {
+      background: rgb(10 10 11);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+</style>

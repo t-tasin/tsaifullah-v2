@@ -1,37 +1,44 @@
 ---
 title: "T.A.R.S"
-description: "Personal AI assistant handling ambient automation across my life."
+description: "Self-hosted multi-agent platform that triages production errors and opens fixes behind a human gate."
+summary: "Self-hosted multi-agent platform running 24/7 on my own hardware. It ingests production error telemetry from AtlasDesk, clusters traces by deterministic fingerprint, runs LLM root-cause analysis, and files a GitHub issue in 21 seconds. Fixes can open a PR only after a recorded three-tier human approval."
 role: "Creator"
-status: "Active Development"
-stack: ["Local LLMs", "Python", "Home Assistant", "FastAPI"]
+status: "Active"
+stack: ["Python", "FastAPI", "LangGraph", "LiteLLM", "Redis", "Qdrant", "Docker", "systemd"]
 order: 2
+lens: ["engineering"]
+metrics:
+  - { value: "21s", label: "trace to filed issue" }
+  - { value: "3-tier", label: "human approval before any PR" }
+  - { value: "38", label: "architecture decision records" }
 ---
 
-import TARSDemo from '../../components/demos/TARSDemo';
+import TarsPipeline from '../../components/diagrams/tars/TarsPipeline';
 
-<div className="my-12">
-  <TARSDemo client:load />
+AtlasDesk emits crash telemetry. For a while I read it myself, which is the same as saying I read it when I remembered to.
+
+T.A.R.S. is what reads it now. It runs 24/7 on hardware I own, ingests production error traces from AtlasDesk services, and turns them into filed, investigated GitHub issues in **21 seconds** end-to-end.
+
+<div className="not-article my-12">
+  <TarsPipeline client:visible />
 </div>
 
-## The Problem
+## The split that makes it trustworthy
 
-I wanted a "second brain" that didn't just store information, but actively worked for me. Existing voice assistants are limited to basic commands and lack context about my ongoing projects, communications, and daily routines.
+Traces are clustered by deterministic sha256 fingerprint and ranked on severity ladders. Both are code. The model never decides whether two errors are the same error, or how bad one is — it extracts detail and reasons about cause, and the judgment that has to be reproducible stays in functions I can unit-test.
 
-## What it Does
+Put another way: **the LLM extracts, the code judges.** Everything downstream depends on that line holding.
 
-T.A.R.S is a continuously running background service on my home server. It listens for ambient triggers—calendar events, emails, sensor data—and takes proactive action using local LLM inference.
+## Writes are gated, and the gate does not trust the messenger
 
-- **Contextual Awareness** · Summarizes threads and drafts prep notes before meetings.
-- **Ambient Automation** · Controls physical environment (lights, displays) based on focus state.
-- **Private by Default** · Runs locally on my apartment server without sending sensitive personal data to external APIs.
+T.A.R.S. can open pull requests. Fixes run in isolated git worktrees on a dedicated worker, and a PR opens only after a recorded three-tier human approval, requested over Telegram against an owner-ID allowlist.
 
-## Architecture
+The detail I care about: the gate re-reads the approval from the database rather than trusting the event payload that woke it. An approval is a row, not a message. Tokens are passed per command and never written to git config. There is no code path where the system writes to a repository because something told it that it was allowed to.
 
-*(Architecture diagram placeholder)*
-<div className="w-full aspect-video border border-dashed border-border flex items-center justify-center text-muted font-mono bg-surface mb-12">
-  [T.A.R.S Architecture]
-</div>
+## Cost, tests, decisions
 
-## Outcome
+Model routing is two-tier — heavy reasoning goes to Claude, cheap classification to DeepSeek through LiteLLM, with config-driven fallback chains, per-day cost caps and a budget ledger. Roughly 1:1 test-to-source, external services faked behind interfaces, and an automated destroy-and-restore test that proves the backups actually restore. 38 architecture decision records cover the tradeoffs of every major choice, including the ones I got wrong first.
 
-In active development and used daily. It has reduced my manual task-switching overhead and acts as a true automated assistant.
+## Disclosure
+
+I built it by orchestrating Claude Code under a written implementer/reviewer protocol, across nine days. The protocol is the interesting half: what the implementer was allowed to decide, what came back to me, and which checks ran before anything merged. The architecture decisions above are mine and I will defend any of them.

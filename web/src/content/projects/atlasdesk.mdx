@@ -1,11 +1,17 @@
 ---
 title: "AtlasDesk"
 description: "Production ITSM platform — single-tenant on-prem and multi-tenant SaaS, one codebase."
-role: "Solo Product Engineer"
+summary: "IT service platform I designed, built, and shipped solo, live at The College of Wooster. SAML SSO with Entra ID, a no-code permission matrix, and an AI resolution copilot on pgvector RAG. One codebase serves an on-prem SQL Server deployment and a Postgres SaaS. It replaced a $20K/year vendor tool."
+role: "Product & Engineering Lead"
 status: "Production"
-users: "4000+"
+users: "4,000+"
 stack: ["NestJS", "Next.js", "PostgreSQL", "SQL Server", "pgvector"]
 order: 1
+lens: ["product", "engineering"]
+metrics:
+  - { value: "4,000+", label: "users on campus" }
+  - { value: "800", label: "tickets a month" }
+  - { value: "24h → ~15m", label: "average resolution, all tickets" }
 ---
 
 import MasterArchitecture from '../../components/diagrams/system/MasterArchitecture';
@@ -25,7 +31,7 @@ This page walks through the system. The diagrams animate on their own — that's
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">The whole picture</h2>
 
 <div className="mt-8 mb-16">
-  <MasterArchitecture client:load />
+  <MasterArchitecture client:visible />
 </div>
 
 Seven services, three lanes. Edge is a <span className="text-accent font-semibold">Next.js 15</span> frontend. The services layer is six <span className="text-accent font-semibold">NestJS</span> microservices, each with its own Postgres schema. The data layer forks: SaaS deployments use <span className="text-accent font-semibold">PostgreSQL</span>, the on-prem deployment uses <span className="text-accent font-semibold">SQL Server 2022</span>. Same <span className="text-accent font-semibold">Docker</span> image runs both — `DB_PROVIDER` is a build arg.
@@ -57,7 +63,7 @@ A few things in that diagram are worth calling out, because they're load-bearing
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Identity service · nightly Entra sync</h2>
 
 <div className="mt-8 mb-16">
-  <EntraSync client:load />
+  <EntraSync client:visible />
 </div>
 
 The on-prem customer authenticates through <span className="text-accent font-semibold">Microsoft Entra ID</span> via SAML. <span className="text-accent font-semibold">JIT provisioning</span> handles first-time logins, but I also need a nightly reconciliation pass — for departures, role changes, group membership updates that happen out-of-band.
@@ -75,7 +81,7 @@ A cron fires at 02:00. `identity-svc` calls <span className="text-accent font-se
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Ticket service · the lifecycle</h2>
 
 <div className="mt-8 mb-16">
-  <TicketLifecycle client:load />
+  <TicketLifecycle client:visible />
 </div>
 
 A ticket starts as either an email or a web-form submit. If it's email, `notification-svc` parses it and hands a structured payload to `ticket-svc`. From there it's six stages: submit, inbound, create, assign, resolve, notify. The "owning service" row underneath shows which microservice handles each stage — and you can see that ticket-svc owns the middle four, with notification-svc bracketing the boundary on either side.
@@ -87,7 +93,7 @@ Escalation is role-based, not user-based. When a ticket needs to escalate from a
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Asset service · the single-writer rule</h2>
 
 <div className="mt-8 mb-16">
-  <ReservationFlow client:load />
+  <ReservationFlow client:visible />
 </div>
 
 Reservations are the highest-concurrency operation in the system. A class of forty students all clicking "reserve a MacBook" at the same moment is a thing that actually happens.
@@ -110,7 +116,7 @@ This single rule has saved more debugging time than any other architectural deci
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">Resolution Copilot · the RAG pipeline</h2>
 
 <div className="mt-8 mb-16">
-  <CopilotRag client:load />
+  <CopilotRag client:visible />
 </div>
 
 This is the part I most enjoyed building, and it's also the part I'd most expect to be questioned about in an interview, so here's the full picture.
@@ -220,7 +226,7 @@ A few discipline rules that don't fit neatly into the per-service sections, but 
 
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">What's running where</h2>
 
-The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 4,000+ users in production, ~14 active techs, ~7000 asset inventory.
+The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 4,000+ users in production, ~14 active techs, 6,000+ assets.
 
 The SaaS demo tier is in flight. Multi-tenant Postgres on Railway, Next.js frontend on Vercel, password + OTP auth, Microsoft Entra still as an SSO option for orgs that want it.
 

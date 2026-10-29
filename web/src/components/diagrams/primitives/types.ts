@@ -14,8 +14,8 @@ export type DiagramTheme = {
 export const THEME: DiagramTheme = {
   bg: "#0a0a0b",
   surface: "#111113",
-  border: "#27272a",
+  border: "#26262a",
   muted: "#a1a1aa",
-  foreground: "#fafafa",
-  accent: "#10b981",
+  foreground: "#f4f4f5",
+  accent: "#6fdcaa",
 };

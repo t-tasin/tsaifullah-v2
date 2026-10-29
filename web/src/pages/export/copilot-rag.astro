@@ -1,5 +1,9 @@
 ---
 import CopilotRagDiagram from '../../components/diagrams/copilot/CopilotRag';
+
+// Local-only page for scripts/export-diagram.ts (runs against the dev server).
+// The live site sends visitors home instead.
+if (import.meta.env.PROD) return Astro.redirect('/');
 ---
 
 <!doctype html>

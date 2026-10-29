@@ -1,0 +1,9 @@
+# Private working notes (not for the public repo)
+case-study-launch.md
+portfolioSite.md
+
+# Build output and local tooling
+web/dist/
+web/.astro/
+.playwright-mcp/
+.DS_Store

@@ -1,109 +1,167 @@
-import React, { useEffect, useState } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
 import { nodesData } from './avatarNodesData';
 
-export default function LivingAvatar() {
-  const controls = useAnimation();
-  const [phase, setPhase] = useState(0);
+type Props = {
+  /** Play the assemble sequence. Off = render the finished face immediately. */
+  animate?: boolean;
+  className?: string;
+};
+
+const SESSION_KEY = 'ts-avatar-played';
+
+// viewBox the node data was authored in
+const VB = { x: -20, y: -20, w: 140, h: 140 };
+
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+/**
+ * The node-swarm portrait, drawn on one <canvas>.
+ *
+ * It assembles once per browser session (scattered → face → traced line), then
+ * stays still. Under reduced motion, or on later visits, it renders the final
+ * frame directly. One canvas replaces ~450 animated SVG elements.
+ */
+export default function LivingAvatar({ animate = true, className = '' }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    async function sequence() {
-      // Step 1: Fly in to scattered abstract topology
-      await controls.start("abstract");
-      setPhase(1);
-      
-      // Step 2: Hold briefly, then snap to face shape
-      await new Promise(resolve => setTimeout(resolve, 800));
-      await controls.start("face");
-      setPhase(2);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      // Step 3: Draw the tracing line
-      await controls.start("trace");
-      setPhase(3);
+    const styles = getComputedStyle(canvas);
+    const fg = styles.getPropertyValue('--avatar-fg').trim() || '#f4f4f5';
+    const accent = styles.getPropertyValue('--avatar-accent').trim() || '#6fdcaa';
+
+    let size = 0;
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      size = rect.width;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const px = (v: number, axis: 'x' | 'y') => ((v - (axis === 'x' ? VB.x : VB.y)) / VB.w) * size;
+
+    // t in seconds since start. Timeline: assemble 0–1.4, hold, morph 1.8–3.4, trace 3.4–5.6.
+    const draw = (t: number) => {
+      ctx.clearRect(0, 0, size, size);
+      const assemble = easeOut(clamp01(t / 1.4));
+      const morph = easeInOut(clamp01((t - 1.8) / 1.6));
+      const trace = easeInOut(clamp01((t - 3.4) / 2.2));
+
+      const pts = nodesData.map((n) => {
+        const ax = n.hx + (n.ax - n.hx) * assemble;
+        const ay = n.hy + (n.ay - n.hy) * assemble;
+        return { x: px(ax + (n.fx - ax) * morph, 'x'), y: px(ay + (n.fy - ay) * morph, 'y') };
+      });
+
+      // Faint network edges, fading as the face resolves
+      ctx.globalAlpha = 0.18 * assemble * (1 - 0.6 * morph);
+      ctx.strokeStyle = fg;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      for (let i = 1; i < Math.min(150, pts.length); i++) {
+        ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+        ctx.lineTo(pts[i].x, pts[i].y);
+      }
+      ctx.stroke();
+
+      // Nodes
+      ctx.globalAlpha = assemble * (1 - 0.45 * morph);
+      ctx.fillStyle = fg;
+      const r = Math.max(0.8, size / 360);
+      for (const p of pts) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // The single traced line through every node
+      if (trace > 0) {
+        const count = Math.max(2, Math.floor(trace * pts.length));
+        ctx.globalAlpha = 0.85;
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = Math.max(1, size / 230);
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < count; i++) ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const END = 5.6;
+    let raf = 0;
+    let disposed = false;
+
+    resize();
+
+    let played = false;
+    try {
+      played = sessionStorage.getItem(SESSION_KEY) === '1';
+    } catch {}
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const willPlay = animate && !reduce && !played;
+    // Last drawn time, so a resize redraws the same frame instead of jumping ahead.
+    let lastT = willPlay ? 0 : END;
+
+    const ro = new ResizeObserver(() => {
+      resize();
+      if (!raf) draw(lastT);
+    });
+    ro.observe(canvas);
+
+    if (!willPlay) {
+      draw(END);
+    } else {
+      // Start only once the canvas is on screen.
+      const io = new IntersectionObserver((entries) => {
+        if (!entries[0]?.isIntersecting || disposed) return;
+        io.disconnect();
+        try {
+          sessionStorage.setItem(SESSION_KEY, '1');
+        } catch {}
+        const start = performance.now();
+        const tick = (now: number) => {
+          if (disposed) return;
+          const t = Math.min(END, (now - start) / 1000);
+          lastT = t;
+          draw(t);
+          if (t < END) raf = requestAnimationFrame(tick);
+          else raf = 0;
+        };
+        raf = requestAnimationFrame(tick);
+      });
+      io.observe(canvas);
+      return () => {
+        disposed = true;
+        io.disconnect();
+        ro.disconnect();
+        cancelAnimationFrame(raf);
+      };
     }
-    
-    // Slight initial delay to let the page load
-    setTimeout(sequence, 500);
-  }, [controls]);
 
-  // Create the path string that connects all nodes in order (Nearest Neighbor TSP sorted)
-  const pathData = nodesData.reduce((acc, node, i) => {
-    return acc + (i === 0 ? `M ${node.fx} ${node.fy}` : ` L ${node.fx} ${node.fy}`);
-  }, "");
+    return () => {
+      disposed = true;
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [animate]);
 
   return (
-    <div className="w-full h-full min-h-[400px] md:min-h-[600px] relative flex items-center justify-center">
-      <svg viewBox="-20 -20 140 140" className="w-full h-full overflow-visible opacity-90">
-        
-        {/* Faint network lines (shown in phase 1 & 2) */}
-        {nodesData.slice(0, 150).map((n, i) => {
-          if (i === 0) return null;
-          const prev = nodesData[i - 1];
-          return (
-            <motion.line
-              key={`edge-${i}`}
-              stroke="currentColor"
-              strokeWidth="0.1"
-              className="text-muted/30"
-              variants={{
-                hidden: { opacity: 0 },
-                abstract: { opacity: 1, x1: prev.ax, y1: prev.ay, x2: n.ax, y2: n.ay, transition: { duration: 2 } },
-                face: { opacity: 0.2, x1: prev.fx, y1: prev.fy, x2: n.fx, y2: n.fy, transition: { duration: 2, ease: "easeInOut" } },
-                trace: { opacity: 0.1, x1: prev.fx, y1: prev.fy, x2: n.fx, y2: n.fy }
-              }}
-              initial="hidden"
-              animate={controls}
-            />
-          );
-        })}
-
-        {/* The nodes */}
-        {nodesData.map((node, i) => (
-          <motion.circle
-            key={`node-${i}`}
-            r="0.4"
-            fill="currentColor"
-            className="text-foreground"
-            variants={{
-              hidden: { cx: node.hx, cy: node.hy, opacity: 0 },
-              abstract: { cx: node.ax, cy: node.ay, opacity: 1, transition: { duration: 1.5, delay: (i % 20) * 0.05, type: "spring", bounce: 0.1 } },
-              face: { cx: node.fx, cy: node.fy, opacity: 0.6, transition: { duration: 2, ease: "easeInOut" } },
-              trace: { cx: node.fx, cy: node.fy, opacity: 0.4 }
-            }}
-            initial="hidden"
-            animate={controls}
-          />
-        ))}
-
-        {/* The continuous tracing line */}
-        <motion.path
-          d={pathData}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="0.6"
-          className="text-accent"
-          variants={{
-            hidden: { pathLength: 0, opacity: 0 },
-            abstract: { pathLength: 0, opacity: 0 },
-            face: { pathLength: 0, opacity: 1 },
-            trace: { pathLength: 1, opacity: 0.8, transition: { duration: 4, ease: "easeInOut" } }
-          }}
-          initial="hidden"
-          animate={controls}
-        />
-      </svg>
-      
-      {/* Dynamic Label */}
-      <motion.span 
-        className="font-mono text-muted text-[10px] absolute bottom-8 right-8 opacity-50 uppercase tracking-widest"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase > 0 ? 0.5 : 0 }}
-        transition={{ duration: 1 }}
-      >
-        {phase === 1 && "SYS.SWARM_TOPOLOGY"}
-        {phase === 2 && "SYS.ALIGNING"}
-        {phase === 3 && "SYS.MAPPED_SUBJECT_T"}
-      </motion.span>
-    </div>
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className={`block w-full aspect-square [--avatar-fg:theme(colors.foreground)] [--avatar-accent:theme(colors.accent)] ${className}`}
+    />
   );
 }

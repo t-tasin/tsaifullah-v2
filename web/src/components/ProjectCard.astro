@@ -1,0 +1,40 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+}
+
+const { entry } = Astro.props;
+const { title, summary, description, lens, metrics, status } = entry.data;
+---
+
+<a
+  href={`/projects/${entry.slug}`}
+  class="pressable pressable-card group block rounded-2xl border border-border bg-surface/60 p-6 sm:p-8 transition-colors duration-200 hover:border-white/15 hover:bg-surface"
+>
+  <div class="flex items-center gap-2 mb-5">
+    {lens.map((l) => <span class="chip capitalize">{l}</span>)}
+    <span class="ml-auto t-label">{status}</span>
+  </div>
+
+  <h3 class="t-heading text-foreground" transition:name={`project-title-${entry.slug}`}>{title}</h3>
+  <p class="mt-3 text-muted leading-relaxed max-w-[60ch]">{summary ?? description}</p>
+
+  {metrics.length > 0 && (
+    <dl class="mt-7 grid grid-cols-3 gap-4 border-t border-border pt-5">
+      {metrics.map((m) => (
+        <div class="min-w-0">
+          <dt class="sr-only">{m.label}</dt>
+          <dd class="text-foreground font-semibold tracking-[-0.02em] text-lg sm:text-xl tabular-nums">{m.value}</dd>
+          <dd class="text-faint text-xs sm:text-sm mt-1 leading-snug">{m.label}</dd>
+        </div>
+      ))}
+    </dl>
+  )}
+
+  <span class="mt-6 inline-flex items-center gap-1.5 text-sm text-accent">
+    Read the case study
+    <span class="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true">→</span>
+  </span>
+</a>
