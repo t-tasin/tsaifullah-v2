@@ -12,8 +12,22 @@ interface Props {
 
 const {
   title,
-  description = 'Tasin (KM Khalid Saifullah) builds products end to end: from user interviews to systems running in production.',
+  description = 'Tasin (KM Khalid Saifullah) is an IT and software engineer who built AtlasDesk, the IT service management platform in production at The College of Wooster, and administers its Microsoft Entra ID and Intune environment.',
 } = Astro.props;
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'KM Khalid Saifullah',
+  alternateName: 'Tasin',
+  url: 'https://tsaifullah.com',
+  jobTitle: 'IT and Software Engineer',
+  address: { '@type': 'PostalAddress', addressLocality: 'Cleveland', addressRegion: 'OH', addressCountry: 'US' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'The College of Wooster' },
+  worksFor: { '@type': 'Organization', name: 'The College of Wooster' },
+  knowsAbout: ['IT service management', 'Microsoft Entra ID', 'Microsoft Intune', 'OSDCloud', 'PowerShell', 'macOS support', 'SAML 2.0 SSO', 'Microsoft Graph', 'RAG', 'AI agents', 'Model Context Protocol'],
+  sameAs: ['https://www.linkedin.com/in/k-tasin/', 'https://github.com/t-tasin'],
+};
 ---
 
 <!doctype html>
@@ -28,6 +42,8 @@ const {
     <meta name="generator" content={Astro.generator} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? 'https://tsaifullah.com')} />
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
     <title>{title}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />

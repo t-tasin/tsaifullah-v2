@@ -23,7 +23,7 @@ type Props = { roles: Role[] };
  */
 export default function Experience({ roles }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
-  const [open, setOpen] = useState<Set<string>>(() => new Set([roles[0]?.id]));
+  const [open, setOpen] = useState<Set<string>>(() => new Set(roles.map((r) => r.id)));
   const uid = useId();
 
   const toggle = (id: string) =>

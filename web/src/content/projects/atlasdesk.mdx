@@ -1,17 +1,17 @@
 ---
 title: "AtlasDesk"
 description: "Production ITSM platform — single-tenant on-prem and multi-tenant SaaS, one codebase."
-summary: "IT service platform I designed, built, and shipped solo, live at The College of Wooster. SAML SSO with Entra ID, a no-code permission matrix, and an AI resolution copilot on pgvector RAG. One codebase serves an on-prem SQL Server deployment and a Postgres SaaS. It replaced a $20K/year vendor tool."
+summary: "IT service platform I designed, built, and shipped solo, live at The College of Wooster. SAML SSO with Entra ID, a no-code permission matrix, and an AI resolution copilot on pgvector RAG. One codebase serves an on-prem SQL Server deployment and a Postgres SaaS. It replaced a $22K/year vendor tool."
 role: "Product & Engineering Lead"
 status: "Production"
-users: "4,000+"
+users: "4,705"
 stack: ["NestJS", "Next.js", "PostgreSQL", "SQL Server", "pgvector"]
 order: 1
 lens: ["product", "engineering"]
 metrics:
-  - { value: "4,000+", label: "users on campus" }
-  - { value: "800", label: "tickets a month" }
-  - { value: "24h → ~15m", label: "average resolution, all tickets" }
+  - { value: "4,705", label: "users on campus" }
+  - { value: "1,600+", label: "tickets in the first 6 months" }
+  - { value: "−72%", label: "median resolution (46.7 h → 13.1 h)" }
 ---
 
 import MasterArchitecture from '../../components/diagrams/system/MasterArchitecture';
@@ -21,10 +21,19 @@ import ReservationFlow from '../../components/diagrams/flows/ReservationFlow';
 import EntraSync from '../../components/diagrams/flows/EntraSync';
 
 <div className="text-xl text-muted font-light leading-relaxed mb-16 space-y-4">
-  <p>AtlasDesk is an IT service-management platform — tickets, assets, reservations, notifications, and an AI resolution copilot — running today for an enterprise customer with 4,000+ users on a <span className="text-accent font-semibold">single-tenant on-premises</span> deployment, and shipping next as a <span className="text-accent font-semibold">multi-tenant SaaS</span> at `atlasdesk.app`.</p>
+  <p>AtlasDesk is an IT service-management platform — tickets, assets, reservations, notifications, and an AI resolution copilot — running today for an enterprise customer with 4,705 users on a <span className="text-accent font-semibold">single-tenant on-premises</span> deployment, and shipping next as a <span className="text-accent font-semibold">multi-tenant SaaS</span> at `atlasdesk.app`.</p>
   
   <p>I built it solo. The interesting part isn't the feature list. <strong className="text-foreground">It's that one codebase has to satisfy two very different deployments</strong> — an on-prem <span className="text-accent font-semibold">SQL Server 2022</span> box behind a corporate firewall with <span className="text-accent font-semibold">SAML/Entra</span> auth, and a multi-tenant cloud stack on <span className="text-accent font-semibold">PostgreSQL</span> with password + OTP. Every architectural decision had to survive both worlds.</p>
 </div>
+
+<h2 className="text-2xl font-semibold text-foreground mt-12 mb-6">Built from the help desk</h2>
+
+I was one of three helpdesk technicians at The College of Wooster when I started AtlasDesk, and I still work the desk. That side of the job shaped the platform:
+
+- **Identity and devices.** I administer users and Intune-managed devices in the college’s Microsoft Entra ID tenant. AtlasDesk signs people in through that same tenant over SAML 2.0, and a nightly Microsoft Graph sync keeps its user list matched to Entra.
+- **Imaging.** I wrote a one-run PowerShell pipeline on OSDCloud and Intune that images a laptop, enrolls it in Intune, and leaves it login-ready on campus credentials. Setup dropped from hours to about 10 minutes per machine across 200+ lab machines.
+- **Windows and Mac support.** When campus printing tickets piled up, I traced them to Macs on macOS 27, where Apple dropped Rosetta. I fixed the root cause by installing Rosetta instead of closing the tickets one by one.
+- **AI in the support workflow.** The resolution copilot drafts replies from 33,000+ resolved tickets, and median resolution time fell 72% (46.7 h to 13.1 h) since launch. A read-only AI agent in Microsoft Teams answers department leads’ reporting questions under their own Entra permissions.
 
 This page walks through the system. The diagrams animate on their own — that's a stylistic choice, not a gimmick. I find static architecture diagrams lie about systems being static when they're actually full of in-flight work.
 
@@ -226,7 +235,7 @@ A few discipline rules that don't fit neatly into the per-service sections, but 
 
 <h2 className="text-2xl font-semibold text-foreground mt-20 mb-8">What's running where</h2>
 
-The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 4,000+ users in production, ~14 active techs, 6,000+ assets.
+The on-prem deploy is single-tenant, behind the customer's firewall, talking to their existing Active Directory. SAML, no passwords. SQL Server 2022. 4,705 users in production, 27 IT staff on the platform, 6,000+ assets migrated in.
 
 The SaaS demo tier is in flight. Multi-tenant Postgres on Railway, Next.js frontend on Vercel, password + OTP auth, Microsoft Entra still as an SSO option for orgs that want it.
 

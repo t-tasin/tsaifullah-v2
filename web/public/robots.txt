@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# AI search crawlers are welcome
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /

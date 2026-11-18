@@ -50,7 +50,7 @@ export const roles: Role[] = [
         lens: ['product', 'engineering'],
       },
       {
-        text: 'Deployed it on the college’s on-prem SQL Server and Microsoft Entra tenant (SAML 2.0 SSO), replacing a $20K/year vendor tool for 4,000+ users. It takes 800 tickets a month from 143 departments.',
+        text: 'Deployed it on the college’s on-prem SQL Server and Microsoft Entra tenant (SAML 2.0 SSO), replacing a $22K/year vendor tool for 4,705 users. It handled 1,600+ tickets from 143 departments in its first 6 months.',
         lens: ['engineering'],
       },
       {
@@ -62,7 +62,7 @@ export const roles: Role[] = [
         lens: ['engineering'],
       },
       {
-        text: 'Shipped a retrieval copilot over 33,000+ tickets from six years of history. Since AtlasDesk launched, average resolution across all tickets fell from 24 hours to about 15 minutes.',
+        text: 'Shipped a retrieval copilot over 33,000+ resolved tickets, with personal data redacted before any model call. Median resolution time fell 72% (46.7 h to 13.1 h) since launch.',
         lens: ['product', 'engineering'],
       },
       {
@@ -89,7 +89,7 @@ export const roles: Role[] = [
     context: 'Scope grew from support into solution design and platform ownership.',
     highlights: [
       {
-        text: 'Primary technical contact for 4,000+ faculty, staff, and students. Resolved 500+ support tickets at 90% satisfaction and turned recurring problems into AtlasDesk features.',
+        text: 'Primary technical contact for 4,705 faculty, staff, and students. Resolved 500+ support tickets at 90% satisfaction and turned recurring problems into AtlasDesk features.',
         lens: ['product', 'engineering'],
       },
       {
@@ -97,7 +97,15 @@ export const roles: Role[] = [
         lens: ['product'],
       },
       {
-        text: 'Wrote a one-run PowerShell pipeline on OSDCloud and Intune that images a laptop and leaves it login-ready. Per-machine setup dropped from hours to about 10 minutes across 200+ lab machines.',
+        text: 'Administer users and Intune-managed devices in the college’s Microsoft Entra ID tenant, and support both Windows and Mac users.',
+        lens: ['engineering'],
+      },
+      {
+        text: 'Traced a wave of campus printing tickets to Macs on macOS 27, where Apple dropped Rosetta, and fixed the root cause by installing Rosetta instead of closing tickets one by one.',
+        lens: ['engineering'],
+      },
+      {
+        text: 'Wrote a one-run PowerShell pipeline on OSDCloud and Intune that images a laptop, enrolls it in Intune, and leaves it login-ready on campus credentials. Per-machine setup dropped from hours to about 10 minutes across 200+ lab machines.',
         lens: ['engineering'],
       },
     ],
